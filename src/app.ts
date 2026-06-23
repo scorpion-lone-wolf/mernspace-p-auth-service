@@ -1,2 +1,3 @@
-console.log("Hello Auth Service");
-// const a = 10;
+import { Config } from "./config/index";
+
+console.log(Config.PORT);

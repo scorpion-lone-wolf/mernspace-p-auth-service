@@ -4,10 +4,10 @@
   "description": "The user management service",
   "license": "ISC",
   "author": "",
-  "type": "module",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/app.ts",
+    "dev": "nodemon --watch src --ext ts --exec \"npm run build && node dist/app.js\"",
     "format:fix": "npx prettier . --write",
     "format:check": "npx prettier . --check",
     "lint": "npx eslint .",
@@ -24,6 +24,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.0.0",
+    "dotenv": "^17.4.2",
     "eslint": "^10.5.0",
     "globals": "^17.7.0",
     "husky": "^9.1.7",
