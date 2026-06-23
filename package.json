@@ -10,12 +10,17 @@
     "dev": "nodemon src/app.ts",
     "format:fix": "npx prettier . --write",
     "format:check": "npx prettier . --check",
+    "lint": "npx eslint .",
     "build": "tsc"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^26.0.0",
+    "eslint": "^10.5.0",
+    "globals": "^17.7.0",
     "nodemon": "^3.1.14",
     "prettier": "^3.8.4",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.0"
   }
 }
