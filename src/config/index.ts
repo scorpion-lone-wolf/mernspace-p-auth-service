@@ -8,7 +8,8 @@ if (!PORT) {
 }
 
 const config = {
-  PORT
+  PORT,
+  NODE_ENV
 };
 
 export const Config = Object.freeze(config);
