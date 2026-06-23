@@ -1,0 +1,18 @@
+{
+  "name": "auth-service",
+  "version": "1.0.0",
+  "description": "The user management service",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/app.ts",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "nodemon": "^3.1.14",
+    "typescript": "^6.0.3"
+  }
+}
