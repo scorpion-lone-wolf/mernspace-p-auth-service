@@ -5,9 +5,9 @@
   "license": "ISC",
   "author": "",
   "type": "commonjs",
-  "main": "index.js",
+  "main": "src/server.ts",
   "scripts": {
-    "dev": "nodemon --watch src --ext ts --exec \"npm run build && node dist/app.js\"",
+    "dev": "nodemon src/server.ts",
     "format:fix": "npx prettier . --write",
     "format:check": "npx prettier . --check",
     "lint": "npx eslint .",
@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/express": "^5.0.6",
     "@types/node": "^26.0.0",
     "dotenv": "^17.4.2",
     "eslint": "^10.5.0",
@@ -31,7 +32,11 @@
     "lint-staged": "^16.4.0",
     "nodemon": "^3.1.14",
     "prettier": "^3.8.4",
+    "ts-node": "^10.9.2",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.62.0"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
   }
 }

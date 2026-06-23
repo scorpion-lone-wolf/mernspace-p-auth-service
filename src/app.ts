@@ -1,3 +1,9 @@
-import { Config } from "./config/index";
+import expres from "express";
 
-console.log(Config.PORT);
+const app = expres();
+
+app.get("/", (req, res) => {
+  res.send("Welcome to Auth Service");
+});
+
+export default app;
