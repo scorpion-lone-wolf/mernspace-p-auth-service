@@ -5,7 +5,7 @@ import logger from "./config/logger";
 const app = expres();
 
 app.get("/", async (req, res, next) => {
-  res.send("Welcome to Auth Service");
+  res.send("Welcome to Auth Service again");
 });
 
 // global error handler (it has 4 param which help express distinguish between normal middleware and global error handler)
