@@ -14,7 +14,7 @@ const logger = winston.createLogger({
         winston.format.timestamp(),
         winston.format.json()
       ),
-      silent: Config.NODE_ENV == "test" || Config.NODE_ENV == "dev" // in test and dev we don't want to log anything
+      silent: Config.NODE_ENV == "test" || Config.NODE_ENV == "development" // in test and development we don't want to log anything
     }),
     new winston.transports.File({
       level: "info",
@@ -24,7 +24,7 @@ const logger = winston.createLogger({
       ),
       filename: "combined.log",
       dirname: "logs",
-      silent: Config.NODE_ENV == "test" || Config.NODE_ENV == "dev" // in test and dev we don't want to log anything
+      silent: Config.NODE_ENV == "test" || Config.NODE_ENV == "development" // in test and development we don't want to log anything
     }),
     new winston.transports.File({
       level: "error",
@@ -34,7 +34,7 @@ const logger = winston.createLogger({
       ),
       filename: "error.log",
       dirname: "logs",
-      silent: Config.NODE_ENV == "test" || Config.NODE_ENV == "dev" // in test and dev we don't want to log anything
+      silent: Config.NODE_ENV == "test" || Config.NODE_ENV == "development" // in test and development we don't want to log anything
     })
   ]
 });
