@@ -1,12 +1,16 @@
 import expres, { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
+import "reflect-metadata";
 import logger from "./config/logger";
+import authRouter from "./routes/auth";
 
 const app = expres();
-
+// route handlers
 app.get("/", async (req, res, next) => {
   res.send("Welcome to Auth Service again");
 });
+
+app.use("/auth", authRouter);
 
 // global error handler (it has 4 param which help express distinguish between normal middleware and global error handler)
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
