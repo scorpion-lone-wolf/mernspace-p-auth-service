@@ -50,7 +50,7 @@ describe("POST /auth/resgister", () => {
       expect(response.headers["content-type"]).toContain("application/json");
     });
     it("should save the user into the databse", async () => {
-      // Arrage
+      // Arrange
       const userData = {
         firstName: "John",
         lastName: "Doe",
@@ -67,10 +67,23 @@ describe("POST /auth/resgister", () => {
 
       expect(users.length).toBe(1);
       // partial match
-      console.log(users[0]);
       expect(users[0].firstName).toBe(userData.firstName);
       expect(users[0].lastName).toBe(userData.lastName);
       expect(users[0].email).toBe(userData.email);
+    });
+    it("should return the id of the created user", async () => {
+      // Arrange
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@email.com",
+        password: "secret"
+      };
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+      // Assert
+      const user = response.body.data;
+      expect(user).toHaveProperty("id");
     });
   });
   //   describe("Fields are missing", () => {});
