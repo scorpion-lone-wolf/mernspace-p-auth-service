@@ -20,7 +20,8 @@ export class AuthController {
 
     try {
       // create a hash password for the user
-      const hashPassword = await bcrypt.hash(password, 10);
+      const saltRounds = 10;
+      const hashPassword = await bcrypt.hash(password, saltRounds);
 
       const user = await this.userService.create({
         firstName,
