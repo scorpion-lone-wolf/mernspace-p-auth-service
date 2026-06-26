@@ -150,7 +150,7 @@ describe("POST /auth/resgister", () => {
     });
   });
   describe("Fields are missing", () => {
-    it("should return 400 status code if email filed is missing", async () => {
+    it("should return 400 status code if email field is missing", async () => {
       // Arrange
       const userData = {
         firstName: "John",
@@ -167,7 +167,7 @@ describe("POST /auth/resgister", () => {
       const users = await userRepository.find();
       expect(users.length).toBe(0);
     });
-    it("should return 400 status code if email filed is invalid", async () => {
+    it("should return 400 status code if email field is invalid", async () => {
       // Arrange
       const userData = {
         firstName: "John",
@@ -185,7 +185,7 @@ describe("POST /auth/resgister", () => {
       const users = await userRepository.find();
       expect(users.length).toBe(0);
     });
-    it("should return 400 status code if password filed is missing", async () => {
+    it("should return 400 status code if password field is missing", async () => {
       // Arrange
       const userData = {
         firstName: "John",
