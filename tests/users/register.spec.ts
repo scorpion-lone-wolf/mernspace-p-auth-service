@@ -82,8 +82,7 @@ describe("POST /auth/resgister", () => {
       // Act
       const response = await request(app).post("/auth/register").send(userData);
       // Assert
-      const user = response.body.data;
-      expect(user).toHaveProperty("id");
+      expect(response.body).toHaveProperty("id");
     });
   });
   //   describe("Fields are missing", () => {});
