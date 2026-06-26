@@ -85,7 +85,7 @@ describe("POST /auth/resgister", () => {
       // Act
       const response = await request(app).post("/auth/register").send(userData);
       // Assert
-      expect(response.body).toHaveProperty("id");
+      expect(response.body.data[0]).toHaveProperty("id");
     });
     it("should only assign customer as a role during registration", async () => {
       // Arrange
@@ -167,48 +167,12 @@ describe("POST /auth/resgister", () => {
       const users = await userRepository.find();
       expect(users.length).toBe(0);
     });
-    it("should return 400 status code if email field is invalid", async () => {
-      // Arrange
-      const userData = {
-        firstName: "John",
-        lastName: "Doe",
-        email: "test@email",
-        password: "secret"
-      };
-
-      // Act
-      const response = await request(app).post("/auth/register").send(userData);
-      // Assert
-      expect(response.statusCode).toBe(400);
-      // also no record should be created
-      const userRepository = dataSource.getRepository(User);
-      const users = await userRepository.find();
-      expect(users.length).toBe(0);
-    });
     it("should return 400 status code if password field is missing", async () => {
       // Arrange
       const userData = {
         firstName: "John",
         lastName: "Doe",
         email: "johndoe@eamil.com"
-      };
-
-      // Act
-      const response = await request(app).post("/auth/register").send(userData);
-      // Assert
-      expect(response.statusCode).toBe(400);
-      // also no record should be created
-      const userRepository = dataSource.getRepository(User);
-      const users = await userRepository.find();
-      expect(users.length).toBe(0);
-    });
-    it("should return 400 status code if password length is less then 6", async () => {
-      // Arrange
-      const userData = {
-        firstName: "John",
-        lastName: "Doe",
-        email: "johndoe@eamil.com",
-        password: "12345"
       };
 
       // Act
@@ -267,7 +231,7 @@ describe("POST /auth/resgister", () => {
       // Act
       const respose = await request(app).post("/auth/register").send(userData);
       // Assert
-      expect(respose.body.firstName).toBe("John");
+      expect(respose.body.data[0].firstName).toBe("John");
     });
     it("should trim the email address and make lowercase", async () => {
       // Arrange
@@ -280,7 +244,43 @@ describe("POST /auth/resgister", () => {
       // Act
       const respose = await request(app).post("/auth/register").send(userData);
       // Assert
-      expect(respose.body.email).toBe("johndoe@email.com");
+      expect(respose.body.data[0].email).toBe("johndoe@email.com");
+    });
+    it("should return 400 status code if email field is invalid", async () => {
+      // Arrange
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "test@email",
+        password: "secret"
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+      // Assert
+      expect(response.statusCode).toBe(400);
+      // also no record should be created
+      const userRepository = dataSource.getRepository(User);
+      const users = await userRepository.find();
+      expect(users.length).toBe(0);
+    });
+    it("should return 400 status code if password length is less then 6", async () => {
+      // Arrange
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@eamil.com",
+        password: "12345"
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+      // Assert
+      expect(response.statusCode).toBe(400);
+      // also no record should be created
+      const userRepository = dataSource.getRepository(User);
+      const users = await userRepository.find();
+      expect(users.length).toBe(0);
     });
   });
 });
