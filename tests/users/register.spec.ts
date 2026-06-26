@@ -3,8 +3,8 @@ import request from "supertest";
 import { DataSource } from "typeorm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import app from "../../src/app";
-import { AppDataSource } from "../../src/config/data-source";
-import { User } from "../../src/entities/User";
+import { AppDataSource } from "../../src/config/dataSource";
+import { User } from "../../src/entities/user";
 import { UserRole } from "../../src/enums";
 
 describe("POST /auth/resgister", () => {
@@ -149,5 +149,110 @@ describe("POST /auth/resgister", () => {
       expect(users.length).toBe(1);
     });
   });
-  //   describe("Fields are missing", () => {});
+  describe("Fields are missing", () => {
+    it("should return 400 status code if email filed is missing", async () => {
+      // Arrange
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        password: "secret"
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+      // Assert
+      expect(response.statusCode).toBe(400);
+      // also no record should be created
+      const userRepository = dataSource.getRepository(User);
+      const users = await userRepository.find();
+      expect(users.length).toBe(0);
+    });
+    it("should return 400 status code if email filed is invalid", async () => {
+      // Arrange
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "test@email",
+        password: "secret"
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+      // Assert
+      expect(response.statusCode).toBe(400);
+      // also no record should be created
+      const userRepository = dataSource.getRepository(User);
+      const users = await userRepository.find();
+      expect(users.length).toBe(0);
+    });
+    it("should return 400 status code if password filed is missing", async () => {
+      // Arrange
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@eamil.com"
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+      // Assert
+      expect(response.statusCode).toBe(400);
+      // also no record should be created
+      const userRepository = dataSource.getRepository(User);
+      const users = await userRepository.find();
+      expect(users.length).toBe(0);
+    });
+    it("should return 400 status code if password length is less then 6", async () => {
+      // Arrange
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@eamil.com",
+        password: "12345"
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+      // Assert
+      expect(response.statusCode).toBe(400);
+      // also no record should be created
+      const userRepository = dataSource.getRepository(User);
+      const users = await userRepository.find();
+      expect(users.length).toBe(0);
+    });
+    it("should return 400 status code if firstName is missing", async () => {
+      // Arrange
+      const userData = {
+        lastName: "Doe",
+        email: "johndoe@eamil.com",
+        password: "12345678"
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+      // Assert
+      expect(response.statusCode).toBe(400);
+      // also no record should be created
+      const userRepository = dataSource.getRepository(User);
+      const users = await userRepository.find();
+      expect(users.length).toBe(0);
+    });
+    it("should return 400 status code if lastName length is missing", async () => {
+      // Arrange
+      const userData = {
+        firstName: "John",
+        email: "johndoe@eamil.com",
+        password: "12345678"
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+      // Assert
+      expect(response.statusCode).toBe(400);
+      // also no record should be created
+      const userRepository = dataSource.getRepository(User);
+      const users = await userRepository.find();
+      expect(users.length).toBe(0);
+    });
+  });
 });

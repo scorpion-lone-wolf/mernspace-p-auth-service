@@ -1,10 +1,10 @@
 import { Request } from "express";
-export interface UserData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-}
+import z from "zod";
+import { registerUserSchema } from "../schemas/registerUserSchema";
+
+// creating UserData type based on registerUserSchema
+export type UserData = z.infer<typeof registerUserSchema>;
+
 export interface RegisterUserRequest extends Request {
   body: UserData;
 }
