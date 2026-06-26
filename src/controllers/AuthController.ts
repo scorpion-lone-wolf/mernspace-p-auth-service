@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import { Response } from "express";
 import { Logger } from "winston";
 import { UserService } from "../services/UserService";
@@ -19,15 +18,11 @@ export class AuthController {
     });
 
     try {
-      // create a hash password for the user
-      const saltRounds = 10;
-      const hashPassword = await bcrypt.hash(password, saltRounds);
-
       const user = await this.userService.create({
         firstName,
         lastName,
         email,
-        password: hashPassword
+        password
       });
       this.logger.info("User registered successfully", { id: user.id });
 

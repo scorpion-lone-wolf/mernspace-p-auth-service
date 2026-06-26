@@ -20,6 +20,7 @@ describe("POST /auth/resgister", () => {
   });
   afterAll(async () => {
     // after running all the test inisde this block we are destroying the datasource
+    await dataSource.dropDatabase();
     await dataSource.destroy();
   });
 
@@ -128,6 +129,24 @@ describe("POST /auth/resgister", () => {
           true
         );
       }
+    });
+    it("show throw an error if email already exists", async () => {
+      // Arrange
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@email.com",
+        password: "secret"
+      };
+      // Act
+      await request(app).post("/auth/register").send(userData);
+      // Assert
+      const response = await request(app).post("/auth/register").send(userData);
+      expect(response.statusCode).toBe(409);
+      // also validate that count of user should be 1 only
+      const userRepository = dataSource.getRepository(User);
+      const users = await userRepository.find();
+      expect(users.length).toBe(1);
     });
   });
   //   describe("Fields are missing", () => {});
