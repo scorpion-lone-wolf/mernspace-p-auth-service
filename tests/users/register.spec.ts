@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import request from "supertest";
 import { DataSource } from "typeorm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -5,6 +6,7 @@ import app from "../../src/app";
 import { AppDataSource } from "../../src/config/data-source";
 import { User } from "../../src/entities/User";
 import { UserRole } from "../../src/enums";
+
 describe("POST /auth/resgister", () => {
   let dataSource: DataSource;
 
@@ -100,6 +102,32 @@ describe("POST /auth/resgister", () => {
         where: { email: userData.email }
       });
       expect(user?.role).toBe(UserRole.CUSTOMER);
+    });
+    it("should store the password as a hash in the database", async () => {
+      // Arrange
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@email.com",
+        password: "secret"
+      };
+      // Act
+      await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      // get the user from the database using email filter and select (id,email,password) filed explicitly
+      const userRepository = dataSource.getRepository(User);
+      const user = await userRepository.findOne({
+        where: { email: userData.email },
+        select: { id: true, email: true, password: true }
+      });
+      expect(user).not.toBeUndefined();
+      if (user) {
+        // validate that password is hashed of the user given password using bcrypt
+        expect(await bcrypt.compare(userData.password, user?.password)).toBe(
+          true
+        );
+      }
     });
   });
   //   describe("Fields are missing", () => {});
