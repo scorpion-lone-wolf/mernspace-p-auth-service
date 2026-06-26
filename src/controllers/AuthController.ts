@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { Logger } from "winston";
-import { UserService } from "../services/UserService";
+import { UserService } from "../services/userService";
 import { RegisterUserRequest } from "../types";
 
 export class AuthController {
@@ -10,6 +10,7 @@ export class AuthController {
   ) {}
   async register(req: RegisterUserRequest, res: Response) {
     const { firstName, lastName, email, password } = req.body;
+
     this.logger.debug("New Request to register user", {
       firstName,
       lastName,

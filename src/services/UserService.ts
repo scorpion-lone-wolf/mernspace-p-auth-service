@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import createHttpError, { HttpError } from "http-errors";
 import { Repository } from "typeorm";
-import { User } from "../entities/User";
+import { User } from "../entities/user";
 import { UserData } from "../types";
 import { isUniqueConstraintError } from "../utils/index";
 export class UserService {

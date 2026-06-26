@@ -1,9 +1,9 @@
 import express from "express";
-import { AppDataSource } from "../config/data-source";
+import { AppDataSource } from "../config/dataSource";
 import logger from "../config/logger";
 import { AuthController } from "../controllers/AuthController";
-import { User } from "../entities/User";
-import { UserService } from "../services/UserService";
+import { User } from "../entities/user";
+import { UserService } from "../services/userService";
 
 const authRouter = express.Router();
 
