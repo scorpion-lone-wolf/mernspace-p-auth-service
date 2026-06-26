@@ -255,4 +255,32 @@ describe("POST /auth/resgister", () => {
       expect(users.length).toBe(0);
     });
   });
+  describe("Fields are not given correctly", () => {
+    it("should sanitize the output if firstName has any html tag", async () => {
+      // Arrange
+      const userData = {
+        firstName: "<h1>John</h1> ",
+        lastName: "Doe",
+        email: "johndoe@email.com",
+        password: "secret"
+      };
+      // Act
+      const respose = await request(app).post("/auth/register").send(userData);
+      // Assert
+      expect(respose.body.firstName).toBe("John");
+    });
+    it("should trim the email address and make lowercase", async () => {
+      // Arrange
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "   Johndoe@Email.com ",
+        password: "secret"
+      };
+      // Act
+      const respose = await request(app).post("/auth/register").send(userData);
+      // Assert
+      expect(respose.body.email).toBe("johndoe@email.com");
+    });
+  });
 });

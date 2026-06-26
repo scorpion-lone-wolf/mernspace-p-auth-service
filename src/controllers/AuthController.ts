@@ -28,7 +28,9 @@ export class AuthController {
       this.logger.info("User registered successfully", { id: user.id });
 
       res.status(201).json({
-        id: user.id
+        id: user.id,
+        firstName: user.firstName,
+        email: user.email
       });
     } catch (error) {
       throw error;
