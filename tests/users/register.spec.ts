@@ -1,7 +1,26 @@
 import request from "supertest";
-import { describe, expect, it } from "vitest";
+import { DataSource } from "typeorm";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import app from "../../src/app";
+import { AppDataSource } from "../../src/config/data-source";
+import { User } from "../../src/entities/User";
+import { truncetTables } from "../utils";
+
 describe("POST /auth/resgister", () => {
+  let dataSource: DataSource;
+
+  beforeAll(async () => {
+    dataSource = await AppDataSource.initialize();
+  });
+  beforeEach(async () => {
+    // Database truncation
+    await truncetTables(dataSource);
+  });
+  afterAll(async () => {
+    // after running all the test inisde this block we are destroying the datasource
+    await dataSource.destroy();
+  });
+
   describe("Given all fields", () => {
     it("should return 201 status code", async () => {
       // AAA :
@@ -10,7 +29,7 @@ describe("POST /auth/resgister", () => {
         firstName: "John",
         lastName: "Doe",
         email: "johndoe@email.com",
-        passord: "secret"
+        password: "secret"
       };
       // Act  (call the function that we want to test)
       const response = await request(app).post("/auth/register").send(userData);
@@ -23,14 +42,36 @@ describe("POST /auth/resgister", () => {
         firstName: "John",
         lastName: "Doe",
         email: "johndoe@email.com",
-        passord: "secret"
+        password: "secret"
       };
       // Act  (call the function that we want to test)
       const response = await request(app).post("/auth/register").send(userData);
       // Assert (validating the expected value and the actual value that we got)
       expect(response.headers["content-type"]).toContain("application/json");
     });
-    it("should save data into the databse", async () => {});
+    it("should save the user into the databse", async () => {
+      // Arrage
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@email.com",
+        password: "secret"
+      };
+
+      // Act
+      await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      const userRepository = dataSource.getRepository(User);
+      const users = await userRepository.find();
+
+      expect(users.length).toBe(1);
+      // partial match
+      console.log(users[0]);
+      expect(users[0].firstName).toBe(userData.firstName);
+      expect(users[0].lastName).toBe(userData.lastName);
+      expect(users[0].email).toBe(userData.email);
+    });
   });
   //   describe("Fields are missing", () => {});
 });

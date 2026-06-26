@@ -5,6 +5,9 @@ import logger from "./config/logger";
 import authRouter from "./routes/auth";
 
 const app = expres();
+// make sure json data is available in req.body
+app.use(expres.json());
+
 // route handlers
 app.get("/", async (req, res, next) => {
   res.send("Welcome to Auth Service again");
