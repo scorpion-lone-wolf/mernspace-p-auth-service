@@ -4,8 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import app from "../../src/app";
 import { AppDataSource } from "../../src/config/data-source";
 import { User } from "../../src/entities/User";
-import { truncetTables } from "../utils";
-
+import { UserRole } from "../../src/enums";
 describe("POST /auth/resgister", () => {
   let dataSource: DataSource;
 
@@ -13,8 +12,9 @@ describe("POST /auth/resgister", () => {
     dataSource = await AppDataSource.initialize();
   });
   beforeEach(async () => {
-    // Database truncation
-    await truncetTables(dataSource);
+    // delete all tables of the database(but the database will be present)
+    await dataSource.dropDatabase();
+    await dataSource.synchronize();
   });
   afterAll(async () => {
     // after running all the test inisde this block we are destroying the datasource
@@ -83,6 +83,23 @@ describe("POST /auth/resgister", () => {
       const response = await request(app).post("/auth/register").send(userData);
       // Assert
       expect(response.body).toHaveProperty("id");
+    });
+    it("should only assign customer as a role during registration", async () => {
+      // Arrange
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@email.com",
+        password: "secret"
+      };
+      // Act
+      await request(app).post("/auth/register").send(userData);
+      // Assert (validate the role from the database for this user)
+      const userRepository = dataSource.getRepository(User);
+      const user = await userRepository.findOne({
+        where: { email: userData.email }
+      });
+      expect(user?.role).toBe(UserRole.CUSTOMER);
     });
   });
   //   describe("Fields are missing", () => {});
