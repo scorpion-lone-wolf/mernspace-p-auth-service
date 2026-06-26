@@ -6,6 +6,7 @@ import app from "../../src/app";
 import { AppDataSource } from "../../src/config/dataSource";
 import { User } from "../../src/entities/user";
 import { UserRole } from "../../src/enums";
+import { ErrorResponse } from "../../src/types";
 
 describe("POST /auth/resgister", () => {
   let dataSource: DataSource;
@@ -154,14 +155,17 @@ describe("POST /auth/resgister", () => {
       // Arrange
       const userData = {
         firstName: "John",
-        lastName: "Doe",
-        password: "secret"
+        lastName: "Doe"
+        // password: "secret"
       };
 
       // Act
       const response = await request(app).post("/auth/register").send(userData);
       // Assert
       expect(response.statusCode).toBe(400);
+      const body = response.body as { errors: ErrorResponse[] };
+      expect(body.errors[0].message).contain("Invalid input");
+
       // also no record should be created
       const userRepository = dataSource.getRepository(User);
       const users = await userRepository.find();
@@ -263,6 +267,9 @@ describe("POST /auth/resgister", () => {
       const userRepository = dataSource.getRepository(User);
       const users = await userRepository.find();
       expect(users.length).toBe(0);
+
+      const body = response.body as { errors: ErrorResponse[] };
+      expect(body.errors[0].message).toBe("Invalid email address");
     });
     it("should return 400 status code if password length is less then 6", async () => {
       // Arrange

@@ -1,6 +1,6 @@
 import { type NextFunction, type Request, type Response } from "express";
 import createHttpError from "http-errors";
-import { ZodType } from "zod";
+import { ZodError, ZodType } from "zod";
 
 export const valdiate =
   (schama: ZodType) =>
@@ -9,8 +9,8 @@ export const valdiate =
       req.body = schama.parse(req.body);
       next();
     } catch (error) {
-      if (error instanceof Error) {
-        throw createHttpError(400, error.message);
+      if (error instanceof ZodError) {
+        throw createHttpError(400, error.issues[0]?.message as string);
       }
       throw createHttpError(400, "Validation failed. Invalid request. ");
     }
