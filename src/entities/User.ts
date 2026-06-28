@@ -1,11 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import { UserRole } from "../enums";
+import { BaseEntity } from "./baseEnitity";
+import { RefreshToken } from "./refreshToken";
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn("uuid")
-  id!: number;
-
+export class User extends BaseEntity {
   @Column()
   firstName!: string;
 
@@ -26,4 +25,9 @@ export class User {
     default: UserRole.CUSTOMER
   })
   role!: string;
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
+    onDelete: "CASCADE" // meaning if user is deleted , then delete all the refresh tokens related to this user as well
+  })
+  refreshTokens!: RefreshToken[];
 }

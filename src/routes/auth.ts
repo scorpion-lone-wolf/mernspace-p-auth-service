@@ -7,15 +7,16 @@ import { valdiate } from "../middlewares/validate";
 
 import { AuthController } from "../controllers/authController";
 import { registerUserSchema } from "../schemas/registerUserSchema";
+import { TokenService } from "../services/tokenService";
 import { UserService } from "../services/userService";
 
 const authRouter = express.Router();
 
 // This is dependency injection
-
+const tokenService = new TokenService();
 const userRepository = AppDataSource.getRepository(User);
 const userService = new UserService(userRepository);
-const authController = new AuthController(userService, logger);
+const authController = new AuthController(userService, logger, tokenService);
 
 // all the routes realted to auth
 authRouter.post("/register", valdiate(registerUserSchema), (req, res) =>

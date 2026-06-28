@@ -1,10 +1,7 @@
 import { Response } from "express";
-import createHttpError from "http-errors";
-import jwt from "jsonwebtoken";
-import fs from "node:fs/promises";
-import path from "node:path";
 import { Logger } from "winston";
 import { Config } from "../config";
+import { TokenService } from "../services/tokenService";
 import { UserService } from "../services/userService";
 import { RegisterUserRequest } from "../types";
 
@@ -12,9 +9,11 @@ export class AuthController {
   hourInMilliSeconds = 1000 * 60 * 60; // 1 hr in milliseconds
   constructor(
     private userService: UserService,
-    private logger: Logger
+    private logger: Logger,
+    private tokenService: TokenService
   ) {}
   async register(req: RegisterUserRequest, res: Response) {
+    // Step 1: Getting json body from request
     const { firstName, lastName, email, password } = req.body;
 
     this.logger.debug("New Request to register user", {
@@ -25,6 +24,7 @@ export class AuthController {
     });
 
     try {
+      // Step 2: Create user
       const user = await this.userService.create({
         firstName,
         lastName,
@@ -32,44 +32,19 @@ export class AuthController {
         password
       });
       this.logger.info("User registered successfully", { id: user.id });
-      let privateKey: string;
-      try {
-        privateKey = await fs.readFile(
-          path.join(__dirname, "../../keys/private.pem"),
-          "utf-8"
-        );
-      } catch (error) {
-        console.log("err", error);
-        this.logger.error("Failed to read key", { error });
-        throw createHttpError(500, "Failed to read key");
-      }
 
-      const accessToken = jwt.sign(
-        {
-          sub: user.id,
-          role: user.role
-        },
-        privateKey,
-        {
-          expiresIn: `${Config.REFRESH_TOKEN_VALIDITY_IN_DAYS}h`,
-          algorithm: "RS256",
-          issuer: "auth-service"
-        }
-      );
-      const refreshToken = jwt.sign(
-        {
-          sub: user.id,
-          role: user.role
-        },
-        Config.REFRESH_TOKEN_SECRET,
-        {
-          expiresIn: `${Config.REFRESH_TOKEN_VALIDITY_IN_DAYS}d`,
-          algorithm: "HS256",
-          issuer: "auth-service"
-        }
+      // Step 3: Generate access_token and refresh_token
+      const accessToken = await this.tokenService.generateAccessToken(
+        this.logger,
+        user
       );
 
-      // set the access_token and refresh_token inside cookie
+      const refreshToken = await this.tokenService.generateRefreshToken(
+        user,
+        this.hourInMilliSeconds
+      );
+
+      // Step 4: Set cookies in response to include access_token and refresh_token
       res.cookie("access_token", accessToken, {
         domain: "localhost",
         sameSite: "strict",
@@ -84,6 +59,7 @@ export class AuthController {
           Config.REFRESH_TOKEN_VALIDITY_IN_DAYS * this.hourInMilliSeconds * 24 // x days
       });
 
+      // Step 5: Send response to the user
       res.status(201).json({
         data: [
           {

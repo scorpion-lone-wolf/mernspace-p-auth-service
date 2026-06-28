@@ -4,6 +4,7 @@ import { DataSource } from "typeorm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import app from "../../src/app";
 import { AppDataSource } from "../../src/config/dataSource";
+import { RefreshToken } from "../../src/entities/refreshToken";
 import { User } from "../../src/entities/user";
 import { UserRole } from "../../src/enums";
 import { ErrorResponse } from "../../src/types";
@@ -180,6 +181,26 @@ describe("POST /auth/resgister", () => {
         expect(accessToken).not.toBeUndefined();
         expect(refreshToken).not.toBeUndefined();
       }
+    });
+    it("should store the refresh token in the database", async () => {
+      // Arrange (Prepare)
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@email.com",
+        password: "secret"
+      };
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+      // Assert
+      const refreshTokenRepository = dataSource.getRepository(RefreshToken);
+      const refreshTokenEntry = await refreshTokenRepository
+        .createQueryBuilder("refreshToken")
+        .where("refreshToken.userId = :userId", {
+          userId: response.body.data.at(0).id
+        })
+        .getOne();
+      expect(refreshTokenEntry).not.toBeFalsy();
     });
   });
   describe("Fields are missing", () => {
