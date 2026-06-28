@@ -24,7 +24,14 @@ const config = {
   DB_PORT: requiredEnv("DB_PORT"),
   DB_USERNAME: requiredEnv("DB_USERNAME"),
   DB_PASSWORD: requiredEnv("DB_PASSWORD"),
-  DB_DATABASE_NAME: requiredEnv("DB_DATABASE_NAME")
+  DB_DATABASE_NAME: requiredEnv("DB_DATABASE_NAME"),
+  REFRESH_TOKEN_SECRET: requiredEnv("REFRESH_TOKEN_SECRET"),
+  REFRESH_TOKEN_VALIDITY_IN_DAYS: Number(
+    requiredEnv("REFRESH_TOKEN_VALIDITY_IN_DAYS")
+  ),
+  ACCESS_TOKEN_VALIDITY_IN_HOURS: Number(
+    requiredEnv("ACCESS_TOKEN_VALIDITY_IN_HOURS")
+  )
 };
 
 export const Config = Object.freeze(config);

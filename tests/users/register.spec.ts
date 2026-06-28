@@ -149,6 +149,38 @@ describe("POST /auth/resgister", () => {
       const users = await userRepository.find();
       expect(users.length).toBe(1);
     });
+    it("should return access_token and refresh_token inside a cookie", async () => {
+      // Arrange (Prepare)
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@email.com",
+        password: "secret"
+      };
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      let accessToken: string | undefined;
+      let refreshToken: string | undefined;
+      const cookies = response.headers["set-cookie"];
+
+      expect(Array.isArray(cookies)).toBe(true);
+      if (Array.isArray(cookies)) {
+        // it should contain accessa token and refresh token
+        cookies.forEach((cookie: string) => {
+          if (cookie.startsWith("access_token=")) {
+            accessToken = cookie.split("=")[1];
+          }
+          if (cookie.startsWith("refresh_token=")) {
+            refreshToken = cookie.split("=")[1];
+          }
+        });
+
+        expect(accessToken).not.toBeUndefined();
+        expect(refreshToken).not.toBeUndefined();
+      }
+    });
   });
   describe("Fields are missing", () => {
     it("should return 400 status code if email field is missing", async () => {
