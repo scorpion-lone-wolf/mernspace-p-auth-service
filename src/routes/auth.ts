@@ -6,6 +6,7 @@ import { User } from "../entities/user";
 import { valdiate } from "../middlewares/validate";
 
 import { AuthController } from "../controllers/authController";
+import { RefreshToken } from "../entities/refreshToken";
 import { registerUserSchema } from "../schemas/registerUserSchema";
 import { TokenService } from "../services/tokenService";
 import { UserService } from "../services/userService";
@@ -13,7 +14,8 @@ import { UserService } from "../services/userService";
 const authRouter = express.Router();
 
 // This is dependency injection
-const tokenService = new TokenService();
+const refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
+const tokenService = new TokenService(refreshTokenRepository);
 const userRepository = AppDataSource.getRepository(User);
 const userService = new UserService(userRepository);
 const authController = new AuthController(userService, logger, tokenService);

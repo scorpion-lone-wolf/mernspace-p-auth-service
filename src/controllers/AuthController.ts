@@ -39,20 +39,25 @@ export class AuthController {
         user
       );
 
-      const refreshToken = await this.tokenService.generateRefreshToken(
+      // adding an entry in refresh_token table for the user
+      const newRefreshTokenEntry = await this.tokenService.persistRefreshToken(
         user,
         this.hourInMilliSeconds
+      );
+      const refreshToken = await this.tokenService.generateRefreshToken(
+        user,
+        newRefreshTokenEntry
       );
 
       // Step 4: Set cookies in response to include access_token and refresh_token
       res.cookie("access_token", accessToken, {
-        domain: "localhost",
+        domain: "localhost", // TODO: this should be actual domain
         sameSite: "strict",
         httpOnly: true,
         maxAge: Config.ACCESS_TOKEN_VALIDITY_IN_HOURS * this.hourInMilliSeconds // x hours
       });
       res.cookie("refresh_token", refreshToken, {
-        domain: "localhost",
+        domain: "localhost", // TODO: this should be actual domain
         sameSite: "strict",
         httpOnly: true,
         maxAge:

@@ -2,13 +2,13 @@ import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { Repository } from "typeorm";
 import { Logger } from "winston";
 import { Config } from "../config";
-import { AppDataSource } from "../config/dataSource";
 import { RefreshToken } from "../entities/refreshToken";
 import { User } from "../entities/user";
 export class TokenService {
-  constructor() {}
+  constructor(private refreshTokenRepository: Repository<RefreshToken>) {}
 
   async generateAccessToken(logger: Logger, user: User) {
     let privateKey: string;
@@ -37,17 +37,7 @@ export class TokenService {
     return accessToken;
   }
 
-  async generateRefreshToken(user: User, hourInMilliSeconds: number) {
-    // adding an entry in refresh_token table for the user
-    const refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
-    const newRefreshToken = await refreshTokenRepository.save({
-      user: user,
-      expiresAt: new Date(
-        Date.now() +
-          Config.REFRESH_TOKEN_VALIDITY_IN_DAYS * hourInMilliSeconds * 24
-      )
-    });
-
+  async generateRefreshToken(user: User, newRefreshTokenEntry: RefreshToken) {
     const refreshToken = jwt.sign(
       {
         sub: user.id,
@@ -58,9 +48,20 @@ export class TokenService {
         expiresIn: `${Config.REFRESH_TOKEN_VALIDITY_IN_DAYS}d`,
         algorithm: "HS256",
         issuer: "auth-service",
-        jwtid: String(newRefreshToken.id) // use refresh token id as jwtid
+        jwtid: String(newRefreshTokenEntry.id) // use refresh token id as jwtid
       }
     );
     return refreshToken;
+  }
+
+  async persistRefreshToken(user: User, hourInMilliSeconds: number) {
+    const newRefreshTokenEntry = await this.refreshTokenRepository.save({
+      user: user,
+      expiresAt: new Date(
+        Date.now() +
+          Config.REFRESH_TOKEN_VALIDITY_IN_DAYS * hourInMilliSeconds * 24
+      )
+    });
+    return newRefreshTokenEntry;
   }
 }
