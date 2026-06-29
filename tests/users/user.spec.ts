@@ -93,5 +93,11 @@ describe("GET /auth/me", () => {
       // check user password should not be returned
       expect(response.body.data.at(0)).not.toHaveProperty("password");
     });
+    it("should return 401 status code if we dont send any token", async () => {
+      const response = await request(app).get("/auth/me");
+      // Assert
+      // check user password should not be returned
+      expect(response.statusCode).toBe(401);
+    });
   });
 });
