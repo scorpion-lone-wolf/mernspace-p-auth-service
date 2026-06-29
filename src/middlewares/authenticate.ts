@@ -46,7 +46,7 @@ export const authenticate = async (
     const kid = decodedValue.header.kid;
     const key = await jwkClient.getSigningKey(kid);
     const publicKey = key.getPublicKey(); // This public key will be used to verify the token
-    console.log("Public", publicKey);
+
     // verify the token
     const verifiedToken = jwt.verify(accessToken, publicKey, {
       algorithms: ["RS256"]
