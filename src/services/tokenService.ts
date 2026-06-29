@@ -45,7 +45,7 @@ export class TokenService {
       },
       Config.REFRESH_TOKEN_SECRET,
       {
-        expiresIn: `${Config.REFRESH_TOKEN_VALIDITY_IN_DAYS}d`,
+        expiresIn: `${Config.ACCESS_TOKEN_VALIDITY_IN_HOURS}h`,
         algorithm: "HS256",
         issuer: "auth-service",
         jwtid: String(newRefreshTokenEntry.id) // use refresh token id as jwtid
