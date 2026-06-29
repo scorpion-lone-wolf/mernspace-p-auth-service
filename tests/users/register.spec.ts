@@ -22,7 +22,6 @@ describe("POST /auth/resgister", () => {
   });
   afterAll(async () => {
     // after running all the test inisde this block we are destroying the datasource
-    await dataSource.dropDatabase();
     await dataSource.destroy();
   });
 

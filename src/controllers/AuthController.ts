@@ -1,9 +1,9 @@
 import { Response } from "express";
 import { Logger } from "winston";
-import { Config } from "../config";
 import { TokenService } from "../services/tokenService";
 import { UserService } from "../services/userService";
-import { RegisterUserRequest } from "../types";
+import { LoginUserRequest, RegisterUserRequest } from "../types";
+import { setAuthCookies } from "../utils/authCookies";
 
 export class AuthController {
   hourInMilliSeconds = 1000 * 60 * 60; // 1 hr in milliseconds
@@ -49,20 +49,8 @@ export class AuthController {
         newRefreshTokenEntry
       );
 
-      // Step 4: Set cookies in response to include access_token and refresh_token
-      res.cookie("access_token", accessToken, {
-        domain: "localhost", // TODO: this should be actual domain
-        sameSite: "strict",
-        httpOnly: true,
-        maxAge: Config.ACCESS_TOKEN_VALIDITY_IN_HOURS * this.hourInMilliSeconds // x hours
-      });
-      res.cookie("refresh_token", refreshToken, {
-        domain: "localhost", // TODO: this should be actual domain
-        sameSite: "strict",
-        httpOnly: true,
-        maxAge:
-          Config.REFRESH_TOKEN_VALIDITY_IN_DAYS * this.hourInMilliSeconds * 24 // x days
-      });
+      // Set cookies in response to include access_token and refresh_token
+      setAuthCookies(res, accessToken, refreshToken, this.hourInMilliSeconds);
 
       // Step 5: Send response to the user
       res.status(201).json({
@@ -74,6 +62,36 @@ export class AuthController {
           }
         ]
       });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async login(req: LoginUserRequest, res: Response) {
+    try {
+      // Get the email and password from request body
+      const { email, password } = req.body;
+      const user = await this.userService.login({ email, password });
+
+      const accessToken = await this.tokenService.generateAccessToken(
+        this.logger,
+        user
+      );
+
+      // adding an entry in refresh_token table for the user
+      const newRefreshTokenEntry = await this.tokenService.persistRefreshToken(
+        user,
+        this.hourInMilliSeconds
+      );
+      const refreshToken = await this.tokenService.generateRefreshToken(
+        user,
+        newRefreshTokenEntry
+      );
+
+      // Step 4: Set cookies in response to include access_token and refresh_token
+      setAuthCookies(res, accessToken, refreshToken, this.hourInMilliSeconds);
+
+      return res.status(200).json({ id: user.id, message: "Login successful" });
     } catch (error) {
       throw error;
     }
