@@ -23,7 +23,10 @@ describe("GET /auth/me", () => {
     dataSource = await AppDataSource.initialize();
     // creating the jwks server
     // Here this will run a mock server and we can simulate of getting pubic key from this server
-    // We did this beacuse we don't wnat to run actual express server
+    // We did this beacuse we don't want to run actual express server
+    // now when in middleware where we validate the token , we will use jwtsClient to get the kid that was set in header of the token.
+    // we will mention the URI where to get is from. This mock server is running on same address
+    //  by default it exposes "/.well-known.jwks.json"
     jwksMockServer = createJWKSMock("http://localhost:5501");
   });
 
