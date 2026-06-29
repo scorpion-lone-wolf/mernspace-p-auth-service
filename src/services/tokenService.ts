@@ -31,7 +31,8 @@ export class TokenService {
       {
         expiresIn: `${Config.REFRESH_TOKEN_VALIDITY_IN_DAYS}h`,
         algorithm: "RS256",
-        issuer: "auth-service"
+        issuer: "auth-service",
+        keyid: "auth-key-1"
       }
     );
     return accessToken;
@@ -48,7 +49,8 @@ export class TokenService {
         expiresIn: `${Config.ACCESS_TOKEN_VALIDITY_IN_HOURS}h`,
         algorithm: "HS256",
         issuer: "auth-service",
-        jwtid: String(newRefreshTokenEntry.id) // use refresh token id as jwtid
+        jwtid: String(newRefreshTokenEntry.id), // use refresh token id as jwtid
+        keyid: "auth-key-1"
       }
     );
     return refreshToken;

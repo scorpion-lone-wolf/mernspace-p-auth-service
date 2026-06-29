@@ -13,12 +13,14 @@ export const authenticate = async (
 ) => {
   try {
     // get the token from the cookie
+
     let accessToken;
     accessToken = req.cookies.access_token;
     // if not present in cookies, then get the token from the header
     if (!accessToken) {
       accessToken = req.headers.authorization?.split(" ")[1];
     }
+
     // if not present in cookie or header, then throw error
     if (!accessToken) {
       throw createHttpError(401, "Unauthorized");
@@ -28,6 +30,7 @@ export const authenticate = async (
     if (!decodedValue) {
       throw createHttpError(401, "Unauthorized");
     }
+
     // This decodedValue will have structure like
     /**
       {

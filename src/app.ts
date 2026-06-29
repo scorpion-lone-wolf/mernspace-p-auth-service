@@ -10,6 +10,8 @@ const app = expres();
 app.use(expres.json());
 // make sure cookie data is available in req.cookies
 app.use(cookieParser());
+// adding static files
+app.use(expres.static("public", { dotfiles: "allow" }));
 
 // route handlers
 app.get("/", async (req, res, next) => {
