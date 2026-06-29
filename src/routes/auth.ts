@@ -7,6 +7,7 @@ import { valdiate } from "../middlewares/validate";
 
 import { AuthController } from "../controllers/authController";
 import { RefreshToken } from "../entities/refreshToken";
+import { authenticate } from "../middlewares/authenticate";
 import { loginUserSchema } from "../schemas/loginUserSchema";
 import { registerUserSchema } from "../schemas/registerUserSchema";
 import { TokenService } from "../services/tokenService";
@@ -25,8 +26,11 @@ const authController = new AuthController(userService, logger, tokenService);
 authRouter.post("/register", valdiate(registerUserSchema), (req, res) =>
   authController.register(req, res)
 ); // calling like this don't let register to loose its "this" context
+
 authRouter.post("/login", valdiate(loginUserSchema), (req, res) =>
   authController.login(req, res)
 );
+
+authRouter.get("/me", authenticate, (req, res) => authController.me(req, res));
 
 export default authRouter;

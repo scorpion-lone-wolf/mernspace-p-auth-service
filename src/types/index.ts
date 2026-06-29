@@ -6,6 +6,7 @@ import { registerUserSchema } from "../schemas/registerUserSchema";
 // creating UserData type based on registerUserSchema
 export type UserData = z.infer<typeof registerUserSchema>;
 export type LoginUserData = z.infer<typeof loginUserSchema>;
+
 export interface RegisterUserRequest extends Request {
   body: UserData;
 }

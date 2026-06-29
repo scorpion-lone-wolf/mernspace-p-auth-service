@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import expres, { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
 import "reflect-metadata";
@@ -7,6 +8,8 @@ import authRouter from "./routes/auth";
 const app = expres();
 // make sure json data is available in req.body
 app.use(expres.json());
+// make sure cookie data is available in req.cookies
+app.use(cookieParser());
 
 // route handlers
 app.get("/", async (req, res, next) => {

@@ -58,7 +58,7 @@ describe("POST /auth/login", () => {
         .post("/auth/login")
         .send({ email: userData.email, password: userData.password });
       //   Assert
-      expect(response.body.id).toBeTruthy();
+      expect(response.body.data.at(0).id).toBeTruthy();
     });
     it("should add access_token and refresh_token inside a cookie", async () => {
       const userData = {

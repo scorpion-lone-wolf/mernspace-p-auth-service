@@ -1,4 +1,5 @@
-import { Response } from "express";
+import { Request, Response } from "express";
+import createHttpError from "http-errors";
 import { Logger } from "winston";
 import { TokenService } from "../services/tokenService";
 import { UserService } from "../services/userService";
@@ -96,7 +97,34 @@ export class AuthController {
       setAuthCookies(res, accessToken, refreshToken, this.hourInMilliSeconds);
 
       this.logger.info("User logged in successfully", { id: user.id });
-      return res.status(200).json({ id: user.id, message: "Login successful" });
+      return res
+        .status(200)
+        .json({ data: [{ id: user.id }], message: "Login successful" });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async me(req: Request, res: Response) {
+    try {
+      const { sub } = req?.user || {};
+      if (!sub) {
+        throw createHttpError(401, "Unauthorized");
+      }
+      // check if the user exist with this id or not , if so return the user
+      const user = await this.userService.getUserById(sub);
+      if (!user) {
+        throw createHttpError(404, "User not found");
+      }
+      return res.status(200).json({
+        data: [
+          {
+            id: user.id,
+            firstName: user.firstName,
+            email: user.email
+          }
+        ]
+      });
     } catch (error) {
       throw error;
     }
