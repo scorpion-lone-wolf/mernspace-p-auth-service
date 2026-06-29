@@ -71,6 +71,10 @@ export class AuthController {
     try {
       // Get the email and password from request body
       const { email, password } = req.body;
+      this.logger.info("New Request to login user", {
+        email: email,
+        password: "*********"
+      });
       const user = await this.userService.login({ email, password });
 
       const accessToken = await this.tokenService.generateAccessToken(
@@ -91,6 +95,7 @@ export class AuthController {
       // Step 4: Set cookies in response to include access_token and refresh_token
       setAuthCookies(res, accessToken, refreshToken, this.hourInMilliSeconds);
 
+      this.logger.info("User logged in successfully", { id: user.id });
       return res.status(200).json({ id: user.id, message: "Login successful" });
     } catch (error) {
       throw error;
