@@ -46,13 +46,6 @@ describe("GET /auth/me", () => {
   });
 
   describe("Given user provides token in cookie", () => {
-    it.todo("should return 200 status code if token is valid", async () => {
-      // Arrange (no need to arange anything for this test)
-      //   Act
-      const response = await request(app).get("/auth/me").send();
-      //   Assert
-      expect(response.statusCode).toBe(200);
-    });
     it("should return user data", async () => {
       const userData = {
         firstName: "John",
@@ -69,12 +62,13 @@ describe("GET /auth/me", () => {
         role: createdUser.role
       });
       // Add token to cookie
-      const reponse = await request(app)
+      const response = await request(app)
         .get("/auth/me")
         .set("Cookie", [`access_token=${tokenFromJwksServer}`]);
       // Assert
       // check user id from response matehes the regiseter user id
-      expect(reponse.body.data.at(0).id).toBe(createdUser.id);
+      expect(response.body.data.at(0).id).toBe(createdUser.id);
+      expect(response.statusCode).toBe(200);
     });
   });
 });
