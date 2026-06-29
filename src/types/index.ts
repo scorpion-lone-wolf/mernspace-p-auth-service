@@ -1,8 +1,8 @@
 import { Request } from "express";
+import jwt from "jsonwebtoken";
 import z from "zod";
 import { loginUserSchema } from "../schemas/loginUserSchema";
 import { registerUserSchema } from "../schemas/registerUserSchema";
-
 // creating UserData type based on registerUserSchema
 export type UserData = z.infer<typeof registerUserSchema>;
 export type LoginUserData = z.infer<typeof loginUserSchema>;
@@ -20,3 +20,13 @@ export type ErrorResponse = {
   path: string;
   location: string;
 };
+
+export interface AccessTokenPayload extends jwt.JwtPayload {
+  sub: string;
+  role: string;
+  iat: number;
+  exp: number;
+  jti: string;
+  iss: string;
+  alg: string;
+}
