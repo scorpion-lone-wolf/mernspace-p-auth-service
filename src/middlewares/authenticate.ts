@@ -22,7 +22,7 @@ export const authenticate = async (
     if (!accessToken) {
       throw createHttpError(401, "Unauthorized");
     }
-    // decode and get the kid from the decodedValue (still we have not verified the token that it is valid or not)
+
     const decodedValue = jwt.decode(accessToken, { complete: true }); // { complete: true } is required to get  header + payload + signature
     if (!decodedValue) {
       throw createHttpError(401, "Unauthorized");
