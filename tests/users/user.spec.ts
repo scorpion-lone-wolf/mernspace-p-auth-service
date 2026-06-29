@@ -70,5 +70,28 @@ describe("GET /auth/me", () => {
       expect(response.body.data.at(0).id).toBe(createdUser.id);
       expect(response.statusCode).toBe(200);
     });
+    it("should not return user password", async () => {
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@email.com",
+        password: "secret"
+      };
+      // Register a user (create a user in the database)
+      const userRepository = dataSource.getRepository(User);
+      const createdUser = await userRepository.save(userData);
+      // Generate a token
+      const tokenFromJwksServer = jwksMockServer.token({
+        sub: createdUser.id,
+        role: createdUser.role
+      });
+      // Add token to cookie
+      const response = await request(app)
+        .get("/auth/me")
+        .set("Cookie", [`access_token=${tokenFromJwksServer}`]);
+      // Assert
+      // check user password should not be returned
+      expect(response.body.data.at(0)).not.toHaveProperty("password");
+    });
   });
 });

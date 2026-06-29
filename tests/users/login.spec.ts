@@ -142,24 +142,21 @@ describe("POST /auth/login", () => {
       //   Assert
       expect(response.statusCode).toBe(400);
     });
-    it.todo(
-      "should return 400 status code if password field is missing",
-      async () => {
-        const userData = {
-          firstName: "John",
-          lastName: "Doe",
-          email: "johndoe@email.com",
-          password: "secret"
-        };
-        //   Act (call to the endpoint)
-        // first add the user into the databse
-        await userService.create(userData);
-        const response = await request(app)
-          .post("/auth/login")
-          .send({ email: userData.email });
-        //   Assert
-        expect(response.statusCode).toBe(400);
-      }
-    );
+    it("should return 400 status code if password field is missing", async () => {
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@email.com",
+        password: "secret"
+      };
+      //   Act (call to the endpoint)
+      // first add the user into the databse
+      await userService.create(userData);
+      const response = await request(app)
+        .post("/auth/login")
+        .send({ email: userData.email });
+      //   Assert
+      expect(response.statusCode).toBe(400);
+    });
   });
 });
