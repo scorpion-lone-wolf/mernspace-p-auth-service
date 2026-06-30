@@ -1,8 +1,8 @@
-import type { AccessTokenPayload } from "./index";
+import type { TokenPayload } from "./index";
 declare global {
   namespace Express {
     interface Request {
-      user?: AccessTokenPayload;
+      user?: TokenPayload;
     }
   }
 }

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import createHttpError from "http-errors";
 import { Logger } from "winston";
+import { User } from "../entities/user";
 import { TokenService } from "../services/tokenService";
 import { UserService } from "../services/userService";
 import { LoginUserRequest, RegisterUserRequest } from "../types";
@@ -130,5 +131,31 @@ export class AuthController {
     } catch (error) {
       throw error;
     }
+  }
+
+  async refresh(req: Request, res: Response) {
+    if (!req.user) {
+      throw createHttpError(401, "Unauthorized");
+    }
+    const newRefreshTokenEntry = await this.tokenService.rotateRefreshToken(
+      req.user.jti,
+      { id: req.user.sub, role: req.user.role } as User
+    );
+    const newAccessToken = await this.tokenService.generateAccessToken(
+      this.logger,
+      { id: req.user.sub, role: req.user.role } as User
+    );
+    const newRefreshToken = await this.tokenService.generateRefreshToken(
+      { id: req.user.sub, role: req.user.role } as User,
+      newRefreshTokenEntry
+    );
+    //  add access_token and refresh_token in the respons cookie
+    setAuthCookies(
+      res,
+      newAccessToken,
+      newRefreshToken,
+      this.hourInMilliSeconds
+    );
+    return res.json({ message: "refresh success" });
   }
 }

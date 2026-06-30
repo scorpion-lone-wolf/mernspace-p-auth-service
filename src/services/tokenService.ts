@@ -2,7 +2,7 @@ import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { Repository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 import { Logger } from "winston";
 import { Config } from "../config";
 import { RefreshToken } from "../entities/refreshToken";
@@ -29,7 +29,7 @@ export class TokenService {
       },
       privateKey,
       {
-        expiresIn: `${Config.REFRESH_TOKEN_VALIDITY_IN_DAYS}h`,
+        expiresIn: `${Config.ACCESS_TOKEN_VALIDITY_IN_HOURS}h`,
         algorithm: "RS256",
         issuer: "auth-service",
         keyid: "auth-key-1"
@@ -46,11 +46,10 @@ export class TokenService {
       },
       Config.REFRESH_TOKEN_SECRET,
       {
-        expiresIn: `${Config.ACCESS_TOKEN_VALIDITY_IN_HOURS}h`,
+        expiresIn: `${Config.REFRESH_TOKEN_VALIDITY_IN_DAYS}d`,
         algorithm: "HS256",
         issuer: "auth-service",
-        jwtid: String(newRefreshTokenEntry.id), // use refresh token id as jwtid
-        keyid: "auth-key-1"
+        jwtid: String(newRefreshTokenEntry.id) // use refresh token id as jwtid
       }
     );
     return refreshToken;
@@ -65,5 +64,45 @@ export class TokenService {
       )
     });
     return newRefreshTokenEntry;
+  }
+
+  async rotateRefreshToken(
+    oldRefreshTokenId: string,
+    user: User
+  ): Promise<RefreshToken> {
+    return await this.refreshTokenRepository.manager.transaction(
+      async (manager) => {
+        const refreshTokenRepository = manager.getRepository(RefreshToken);
+        // check if the old refresh token is present or not
+        const oldRefreshToken = await refreshTokenRepository.findOne({
+          where: {
+            id: oldRefreshTokenId,
+            user: { id: user.id },
+            expiresAt: MoreThan(new Date())
+          }
+        });
+        // If oldRefreshToken is not found - Delete all the refresh tokens for the user
+        if (!oldRefreshToken) {
+          await this.refreshTokenRepository.delete({
+            user: { id: user.id }
+          });
+          throw createHttpError(401, "Unauthorized");
+        }
+        // We found he old refresh token
+        // Step 1: Delete the old refresh token entry
+        await refreshTokenRepository.delete({
+          id: oldRefreshTokenId
+        });
+        // Step 2: Generate a new refresh token entry
+        const newRefreshTokenEntry = await refreshTokenRepository.save({
+          user: { id: user.id },
+          expiresAt: new Date(
+            Date.now() +
+              Config.REFRESH_TOKEN_VALIDITY_IN_DAYS * 1000 * 60 * 60 * 24
+          )
+        });
+        return newRefreshTokenEntry;
+      }
+    );
   }
 }

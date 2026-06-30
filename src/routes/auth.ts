@@ -8,6 +8,7 @@ import { valdiate } from "../middlewares/validate";
 import { AuthController } from "../controllers/authController";
 import { RefreshToken } from "../entities/refreshToken";
 import { authenticate } from "../middlewares/authenticate";
+import { valdiateRefreshToken } from "../middlewares/validateRefreshToken";
 import { loginUserSchema } from "../schemas/loginUserSchema";
 import { registerUserSchema } from "../schemas/registerUserSchema";
 import { TokenService } from "../services/tokenService";
@@ -32,5 +33,8 @@ authRouter.post("/login", valdiate(loginUserSchema), (req, res) =>
 );
 
 authRouter.get("/me", authenticate, (req, res) => authController.me(req, res));
+authRouter.post("/refresh", valdiateRefreshToken, (req, res) =>
+  authController.refresh(req, res)
+);
 
 export default authRouter;

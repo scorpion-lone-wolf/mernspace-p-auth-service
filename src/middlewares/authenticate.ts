@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
 import { jwkClient } from "../config/jwks";
-import { AccessTokenPayload } from "../types";
+import { TokenPayload } from "../types";
 // This function is responsible to validate the token
 // If valid then add that to req.user={sub,role}
 // else , we throw error with status code 401 unauthorized
@@ -56,7 +56,7 @@ export const authenticate = async (
       algorithms: ["RS256"]
     });
 
-    req.user = verifiedToken as AccessTokenPayload;
+    req.user = verifiedToken as TokenPayload;
     return next();
   } catch (error) {
     throw error;

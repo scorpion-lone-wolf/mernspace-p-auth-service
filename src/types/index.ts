@@ -21,7 +21,7 @@ export type ErrorResponse = {
   location: string;
 };
 
-export interface AccessTokenPayload extends jwt.JwtPayload {
+export interface TokenPayload extends jwt.JwtPayload {
   sub: string;
   role: string;
   iat: number;
