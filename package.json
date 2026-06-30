@@ -17,7 +17,8 @@
     "build": "tsc",
     "prepare": "husky",
     "start": "ts-node src/index.ts",
-    "typeorm": "typeorm-ts-node-commonjs"
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate",
+    "migration:run": "typeorm-ts-node-commonjs migration:run"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

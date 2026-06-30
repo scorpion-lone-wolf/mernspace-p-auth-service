@@ -12,9 +12,10 @@ export const AppDataSource = new DataSource({
   password: Config.DB_PASSWORD,
   database: Config.DB_DATABASE_NAME,
   // for production set synchronize: false
-  synchronize: Config.NODE_ENV == "test" || Config.NODE_ENV == "development",
+  synchronize: Config.NODE_ENV == "test",
   logging: false,
   entities: [User, RefreshToken],
-  migrations: [],
-  subscribers: []
+  migrations: [__dirname + "/../migrations/*.{ts,js}"],
+  subscribers: [],
+  migrationsRun: false // don't run migration on every app start
 });

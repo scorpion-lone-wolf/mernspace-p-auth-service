@@ -1,7 +1,7 @@
 import { config as dotenvConfig } from "dotenv";
 import path from "node:path";
 
-const nodeEnv = process.env.NODE_ENV;
+const nodeEnv = process.env.NODE_ENV || "development";
 
 dotenvConfig({
   path: path.join(__dirname, `../../.env.${nodeEnv}`)
