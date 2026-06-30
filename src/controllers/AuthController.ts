@@ -171,6 +171,9 @@ export class AuthController {
     }
     // remove the refresh token entry from the database
     await this.tokenService.removeRefreshToken(req.user.jti);
+    // clear the cookie
+    res.clearCookie("refresh_token");
+    res.clearCookie("access_token");
 
     return res.status(200).json({ message: "Logout success" });
   }
