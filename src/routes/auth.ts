@@ -33,8 +33,12 @@ authRouter.post("/login", valdiate(loginUserSchema), (req, res) =>
 );
 
 authRouter.get("/me", authenticate, (req, res) => authController.me(req, res));
+
 authRouter.post("/refresh", valdiateRefreshToken, (req, res) =>
   authController.refresh(req, res)
+);
+authRouter.post("/logout", valdiateRefreshToken, (req, res) =>
+  authController.logout(req, res)
 );
 
 export default authRouter;

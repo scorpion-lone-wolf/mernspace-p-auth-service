@@ -77,6 +77,12 @@ export class AuthController {
         email: email,
         password: "*********"
       });
+      // TODO :
+      // A single  user can have only 2 refresh tokens at a time
+      // So if user tries to login , and we found that he already has 2 refresh tokens in RefreshToken table
+      // Then we will delete one from RefreshToken table
+      // and then proceed to login the user
+
       const user = await this.userService.login({ email, password });
 
       const accessToken = await this.tokenService.generateAccessToken(
@@ -157,5 +163,15 @@ export class AuthController {
       this.hourInMilliSeconds
     );
     return res.json({ message: "refresh success" });
+  }
+
+  async logout(req: Request, res: Response) {
+    if (!req.user) {
+      return res.status(200).json({ message: "Logout success" });
+    }
+    // remove the refresh token entry from the database
+    await this.tokenService.removeRefreshToken(req.user.jti);
+
+    return res.status(200).json({ message: "Logout success" });
   }
 }
