@@ -4,6 +4,8 @@ import { Config } from ".";
 import { RefreshToken } from "../entities/refreshToken";
 import { User } from "../entities/user";
 
+const isTest = Config.NODE_ENV === "test";
+
 export const AppDataSource = new DataSource({
   type: "postgres",
   host: Config.DB_HOST,
@@ -12,10 +14,10 @@ export const AppDataSource = new DataSource({
   password: Config.DB_PASSWORD,
   database: Config.DB_DATABASE_NAME,
   // for production set synchronize: false
-  synchronize: Config.NODE_ENV == "test",
+  synchronize: isTest,
   logging: false,
   entities: [User, RefreshToken],
-  migrations: [__dirname + "/../migrations/*.{ts,js}"],
+  migrations: isTest ? [] : [__dirname + "/../migrations/*.{ts}"],
   subscribers: [],
   migrationsRun: false // don't run migration on every app start
 });
