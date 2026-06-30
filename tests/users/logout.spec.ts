@@ -1,7 +1,6 @@
 import request from "supertest";
 import { DataSource } from "typeorm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { Logger } from "winston";
 import app from "../../src/app";
 import { AppDataSource } from "../../src/config/dataSource";
 import { RefreshToken } from "../../src/entities/refreshToken";
@@ -13,13 +12,11 @@ describe("POST /auth/logout", () => {
   let dataSource: DataSource;
   let userService: UserService;
   let tokenService: TokenService;
-  let logger: Logger;
 
   beforeAll(async () => {
     dataSource = await AppDataSource.initialize();
     userService = new UserService(dataSource.getRepository(User));
     tokenService = new TokenService(dataSource.getRepository(RefreshToken));
-    logger = new Logger();
   });
   beforeEach(async () => {
     // delete all tables of the database(but the database will be present)
@@ -43,8 +40,6 @@ describe("POST /auth/logout", () => {
       // Act
       // create a user in the databse
       const user = await userService.create(userData);
-      //    create a access token for that user
-      const accessToekn = await tokenService.generateAccessToken(logger, user);
       //    add and entry for refresh token in the database
       const refreshTokenEntry = await tokenService.persistRefreshToken(
         user,
@@ -58,7 +53,6 @@ describe("POST /auth/logout", () => {
 
       const response = await request(app)
         .post("/auth/logout")
-        .set("Cookie", `access_token=${accessToekn}`)
         .set("Cookie", `refresh_token=${refreshToken}`);
       //    Assert
       expect(response.statusCode).toBe(200);
@@ -74,8 +68,6 @@ describe("POST /auth/logout", () => {
       // Act
       // create a user in the databse
       const user = await userService.create(userData);
-      //    create a access token for that user
-      const accessToekn = await tokenService.generateAccessToken(logger, user);
       //    add and entry for refresh token in the database
       const refreshTokenEntry = await tokenService.persistRefreshToken(
         user,
@@ -89,7 +81,6 @@ describe("POST /auth/logout", () => {
 
       const response = await request(app)
         .post("/auth/logout")
-        .set("Cookie", `access_token=${accessToekn}`)
         .set("Cookie", `refresh_token=${refreshToken}`);
       const refreshTokenRepository = dataSource.getRepository(RefreshToken);
       const refreshTokenEntries = await refreshTokenRepository.find({
