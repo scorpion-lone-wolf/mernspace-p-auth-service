@@ -3,7 +3,9 @@ import { UserRole } from "../enums";
 import { BaseEntity } from "./baseEnitity";
 import { RefreshToken } from "./refreshToken";
 
-@Entity()
+@Entity({
+  name: "users"
+})
 export class User extends BaseEntity {
   @Column()
   firstName!: string;
