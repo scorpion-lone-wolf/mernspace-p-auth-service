@@ -65,8 +65,6 @@ describe("POST /admin/tenants", () => {
         address: "Address-1"
       };
       //   Act
-      await request(app).post("/tenants").send(tenantData);
-
       const accessToken = jwksServer.token({
         sub: "a17527a0-8c62-4c1b-9819-11b32cae28d8",
         role: UserRole.ADMIN
@@ -93,6 +91,27 @@ describe("POST /admin/tenants", () => {
       const tenants = await tenantRepository.find();
       expect(tenants.length).toBe(0);
       expect(response.statusCode).toBe(401);
+    });
+    it("should return 403 if user is not admin", async () => {
+      // prepare
+      const tenantData = {
+        name: "Tenant-1",
+        address: "Address-1"
+      };
+      //   Act
+      const accessToken = jwksServer.token({
+        sub: "a17527a0-8c62-4c1b-9819-11b32cae28d8",
+        role: UserRole.MANAGER
+      });
+      const response = await request(app)
+        .post("/tenants")
+        .send(tenantData)
+        .set("Cookie", [`access_token=${accessToken}`]);
+      // Assert
+      const tenantRepository = dataSource.getRepository(Tenant);
+      const tenants = await tenantRepository.find();
+      expect(tenants.length).toBe(0);
+      expect(response.statusCode).toBe(403); // Forbidden
     });
   });
 });

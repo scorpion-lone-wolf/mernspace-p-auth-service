@@ -13,7 +13,6 @@ export const authenticate = async (
 ) => {
   try {
     // get the token from the cookie
-
     let accessToken;
     accessToken = req.cookies.access_token;
     // if not present in cookies, then get the token from the header
@@ -59,6 +58,6 @@ export const authenticate = async (
     req.user = verifiedToken as TokenPayload;
     return next();
   } catch (error) {
-    throw createHttpError(401, "Unauthorized");
+    throw error;
   }
 };
