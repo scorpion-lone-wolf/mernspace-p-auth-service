@@ -1,6 +1,9 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { Config } from ".";
+import { RefreshToken } from "../entities/refreshToken";
+import { Tenant } from "../entities/tenant";
+import { User } from "../entities/user";
 
 const isTest = Config.NODE_ENV === "test";
 
@@ -14,7 +17,7 @@ export const AppDataSource = new DataSource({
   // for production set synchronize: false
   synchronize: isTest,
   logging: false,
-  entities: ["src/entities/*.ts"],
+  entities: [User, RefreshToken, Tenant],
   migrations: isTest ? [] : [__dirname + "/../migrations/*.ts"],
   subscribers: [],
   migrationsRun: false // don't run migration on every app start
