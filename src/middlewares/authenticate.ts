@@ -59,6 +59,6 @@ export const authenticate = async (
     req.user = verifiedToken as TokenPayload;
     return next();
   } catch (error) {
-    throw error;
+    throw createHttpError(401, "Unauthorized");
   }
 };

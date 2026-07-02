@@ -3,6 +3,7 @@ import { AppDataSource } from "../config/dataSource";
 import logger from "../config/logger";
 import { TenantController } from "../controllers/tenantController";
 import { Tenant } from "../entities/tenant";
+import { authenticate } from "../middlewares/authenticate";
 import { valdiate } from "../middlewares/validate";
 import { tenantSchema } from "../schemas/tenantSchema";
 import { TenantService } from "../services/tenantService";
@@ -16,7 +17,7 @@ const tenantController = new TenantController(tenantService, logger);
 
 // routes for tenants
 
-tenantRouter.post("/", valdiate(tenantSchema), (req, res) =>
+tenantRouter.post("/", authenticate, valdiate(tenantSchema), (req, res) =>
   tenantController.create(req, res)
 );
 
