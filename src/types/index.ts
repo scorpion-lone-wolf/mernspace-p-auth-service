@@ -3,9 +3,12 @@ import jwt from "jsonwebtoken";
 import z from "zod";
 import { loginUserSchema } from "../schemas/loginUserSchema";
 import { registerUserSchema } from "../schemas/registerUserSchema";
-// creating UserData type based on registerUserSchema
+import { tenantSchema } from "../schemas/tenantSchema";
+
 export type UserData = z.infer<typeof registerUserSchema>;
 export type LoginUserData = z.infer<typeof loginUserSchema>;
+
+export type CreateTenantData = z.infer<typeof tenantSchema>;
 
 export interface RegisterUserRequest extends Request {
   body: UserData;

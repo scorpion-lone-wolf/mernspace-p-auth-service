@@ -4,6 +4,7 @@ import { HttpError } from "http-errors";
 import "reflect-metadata";
 import logger from "./config/logger";
 import authRouter from "./routes/auth";
+import tenantRouter from "./routes/tenant";
 
 const app = expres();
 // make sure json data is available in req.body
@@ -19,6 +20,7 @@ app.get("/", async (req, res, next) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/tenants", tenantRouter);
 
 // global error handler (it has 4 param which help express distinguish between normal middleware and global error handler)
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
