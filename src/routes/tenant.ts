@@ -49,4 +49,11 @@ tenantRouter.patch(
   (req, res) => tenantController.update(req, res)
 );
 
+tenantRouter.delete(
+  "/:id",
+  authenticate,
+  authorized([UserRole.ADMIN]), // aurthorized only for admin
+  (req, res) => tenantController.delete(req, res)
+);
+
 export default tenantRouter;

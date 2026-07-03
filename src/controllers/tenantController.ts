@@ -15,7 +15,7 @@ export class TenantController {
       this.logger.info("New tenant created", tenantData);
       return res
         .status(201)
-        .json({ message: "Tenant created", data: tenantData });
+        .json({ message: "Tenant created successfully", data: tenantData });
     } catch (error) {
       this.logger.error("Error creating tenant", error);
       throw error;
@@ -24,8 +24,16 @@ export class TenantController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const tenants = await this.tenantService.fetchAll();
+      const { page = 1, limit = 10 } = req.query;
+      const pageNumber = Math.max(1, Number(page) || 1);
+      const limitNumber = Math.max(1, Number(limit) || 10);
+      const tenants = await this.tenantService.fetchAll(
+        +pageNumber,
+        +limitNumber
+      );
+
       return res.json({
+        message: "Tenant fetched successfully",
         data: tenants
       });
     } catch (error) {
@@ -40,6 +48,7 @@ export class TenantController {
       }
       const tenant = await this.tenantService.fetch(id);
       return res.json({
+        message: "Tenant fetched successfully",
         data: tenant
       });
     } catch (error) {
@@ -59,6 +68,23 @@ export class TenantController {
       }
       const tenant = await this.tenantService.update(id, req.body);
       return res.json({
+        message: "Tenant updated",
+        data: tenant
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async delete(req: Request, res: Response) {
+    try {
+      const id = String(req.params.id);
+      if (!id) {
+        throw createHttpError(400, "Tenant id is required");
+      }
+      const tenant = await this.tenantService.delete(id);
+      return res.json({
+        message: "Tenant deleted",
         data: tenant
       });
     } catch (error) {

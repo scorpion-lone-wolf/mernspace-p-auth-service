@@ -10,8 +10,11 @@ export class TenantService {
     return await this.tenantRepository.save(tenant);
   }
 
-  async fetchAll(): Promise<Tenant[]> {
-    const tenants = await this.tenantRepository.find();
+  async fetchAll(page: number, limit: number): Promise<Tenant[]> {
+    const tenants = await this.tenantRepository.find({
+      skip: (page - 1) * limit, //offset
+      take: limit
+    });
     return tenants;
   }
   async fetch(id: string): Promise<Tenant> {
@@ -31,5 +34,13 @@ export class TenantService {
     tenant.name = name ?? tenant.name;
     tenant.address = address ?? tenant.address;
     return await this.tenantRepository.save(tenant);
+  }
+
+  async delete(id: string) {
+    const tenant = await this.tenantRepository.findOne({ where: { id } });
+    if (!tenant) {
+      throw createHttpError(404, "Tenant not found");
+    }
+    return await this.tenantRepository.remove(tenant);
   }
 }
