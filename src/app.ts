@@ -20,7 +20,9 @@ app.get("/", async (req, res, next) => {
 });
 
 app.use("/auth", authRouter);
-app.use("/tenants", tenantRouter);
+
+// admin routes
+app.use("/admin/tenants", tenantRouter);
 
 // global error handler (it has 4 param which help express distinguish between normal middleware and global error handler)
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {

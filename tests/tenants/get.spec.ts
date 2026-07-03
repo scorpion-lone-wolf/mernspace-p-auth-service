@@ -15,7 +15,7 @@ import { AppDataSource } from "../../src/config/dataSource";
 import { Tenant } from "../../src/entities/tenant";
 import { UserRole } from "../../src/enums";
 
-describe("GET /tenants", () => {
+describe("GET /admin/tenants", () => {
   let dataSource: DataSource;
   let jwksServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -48,7 +48,7 @@ describe("GET /tenants", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .get("/tenants")
+        .get("/admin/tenants")
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.statusCode).toBe(200);
@@ -67,7 +67,7 @@ describe("GET /tenants", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .get("/tenants")
+        .get("/admin/tenants")
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.body.data.length).toBe(1);
@@ -77,7 +77,7 @@ describe("GET /tenants", () => {
     it("should return 401 status code", async () => {
       // Prepare
       //   Act
-      const response = await request(app).get("/tenants");
+      const response = await request(app).get("/admin/tenants");
       // Assert
       expect(response.statusCode).toBe(401);
     });
@@ -89,7 +89,7 @@ describe("GET /tenants", () => {
         role: UserRole.CUSTOMER
       });
       const response = await request(app)
-        .get("/tenants")
+        .get("/admin/tenants")
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.statusCode).toBe(403);
@@ -97,7 +97,7 @@ describe("GET /tenants", () => {
   });
 });
 
-describe("GET /tenants/:id", () => {
+describe("GET /admin/tenants/:id", () => {
   let dataSource: DataSource;
   let jwksServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -134,7 +134,7 @@ describe("GET /tenants/:id", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .get(`/tenants/${tenant.id}`)
+        .get(`/admin/tenants/${tenant.id}`)
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.statusCode).toBe(200);
@@ -152,7 +152,7 @@ describe("GET /tenants/:id", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .get(`/tenants/${tenant.id}`)
+        .get(`/admin/tenants/${tenant.id}`)
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.body.data.name).toBe(tenantData.name);
@@ -169,7 +169,7 @@ describe("GET /tenants/:id", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .get(`/tenants/a17527a0-8c62-4c1b-9819-11b32cae28d8`)
+        .get(`/admin/tenants/a17527a0-8c62-4c1b-9819-11b32cae28d8`)
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.statusCode).toBe(404);
