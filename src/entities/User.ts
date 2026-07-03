@@ -29,9 +29,7 @@ export class User extends BaseEntity {
   })
   role!: string;
 
-  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
-    onDelete: "CASCADE" // meaning if user is deleted , then delete all the refresh tokens related to this user as well
-  })
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
   refreshTokens!: RefreshToken[];
 
   @ManyToOne(() => Tenant, (tenant) => tenant.users)
