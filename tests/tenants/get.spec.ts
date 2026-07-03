@@ -157,7 +157,7 @@ describe("GET /tenants/:id", () => {
       // Assert
       expect(response.body.data.name).toBe(tenantData.name);
     });
-    it("should return null if no data found", async () => {
+    it("should return 404 if tenant not found", async () => {
       // Prepare
       const tenantData = {
         name: "Tenant-1",
@@ -172,7 +172,7 @@ describe("GET /tenants/:id", () => {
         .get(`/tenants/a17527a0-8c62-4c1b-9819-11b32cae28d8`)
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
-      expect(response.body.data).toBe(null);
+      expect(response.statusCode).toBe(404);
     });
   });
 });

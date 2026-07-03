@@ -46,4 +46,23 @@ export class TenantController {
       throw error;
     }
   }
+
+  async update(req: Request, res: Response) {
+    try {
+      const id = String(req.params.id);
+      if (!id) {
+        throw createHttpError(400, "Tenant id is required");
+      }
+      // check at least one field is ask to be updated
+      if (Object.keys(req.body).length === 0) {
+        throw createHttpError(400, "At least one field is required to update");
+      }
+      const tenant = await this.tenantService.update(id, req.body);
+      return res.json({
+        data: tenant
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 }
