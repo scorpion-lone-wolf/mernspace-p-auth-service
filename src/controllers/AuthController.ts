@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import createHttpError from "http-errors";
 import { Logger } from "winston";
 import { User } from "../entities/user";
+import { UserRole } from "../enums";
 import { TokenService } from "../services/tokenService";
 import { UserService } from "../services/userService";
 import { LoginUserRequest, RegisterUserRequest } from "../types";
@@ -31,7 +32,8 @@ export class AuthController {
         firstName,
         lastName,
         email,
-        password
+        password,
+        role: UserRole.CUSTOMER
       });
       this.logger.info("User registered successfully", { id: user.id });
 

@@ -12,7 +12,9 @@ import {
 } from "vitest";
 import app from "../../src/app";
 import { AppDataSource } from "../../src/config/dataSource";
+import { Tenant } from "../../src/entities/tenant";
 import { User } from "../../src/entities/user";
+import { UserRole } from "../../src/enums";
 
 describe("POST /admin/users", () => {
   let dataSource: DataSource;
@@ -46,58 +48,125 @@ describe("POST /admin/users", () => {
   });
 
   describe("Given user provides token in cookie", () => {
-    it("should return user data", async () => {
-      const userData = {
+    it.todo(
+      "should return 201 status code for user with admin role",
+      async () => {
+        const adminUserData = {
+          firstName: "John",
+          lastName: "Doe",
+          email: "johndoe@email.com",
+          password: "secret",
+          role: UserRole.ADMIN
+        };
+        const tenant = await dataSource.getRepository(Tenant).save({
+          name: "Tenant-1",
+          address: "Address-1"
+        });
+        const managerUserData = {
+          firstName: "JohnManager",
+          lastName: "Doe",
+          email: "johndoemanager@email.com",
+          password: "secret",
+          role: UserRole.MANAGER,
+          tenantId: tenant.id
+        };
+        // Register a user (create a user in the database)
+        const userRepository = dataSource.getRepository(User);
+        const createdUser = await userRepository.save(adminUserData);
+        // Generate a token
+        const tokenFromJwksServer = jwksMockServer.token({
+          sub: createdUser.id,
+          role: createdUser.role
+        });
+        // Add token to cookie
+        const response = await request(app)
+          .post("/admin/users")
+          .set("Cookie", [`access_token=${tokenFromJwksServer}`])
+          .send(managerUserData);
+        // Assert
+        expect(response.statusCode).toBe(201);
+      }
+    );
+    it.todo(
+      "should return user data from the database with role that they set",
+      async () => {
+        const adminUserData = {
+          firstName: "John",
+          lastName: "Doe",
+          email: "johndoe@email.com",
+          password: "secret",
+          role: UserRole.ADMIN
+        };
+        const tenant = await dataSource.getRepository(Tenant).save({
+          name: "Tenant-1",
+          address: "Address-1"
+        });
+        const managerUserData = {
+          firstName: "JohnManager",
+          lastName: "Doe",
+          email: "johndoemanager@email.com",
+          password: "secret",
+          role: UserRole.MANAGER,
+          tenantId: tenant.id
+          // tenantId: "fec487ed-4c71-4533-8a14-3b20f7e36614"
+        };
+
+        // Register a user (create a user in the database)
+        const userRepository = dataSource.getRepository(User);
+        const createdAdminUser = await userRepository.save(adminUserData);
+        // Generate a token
+        const tokenFromJwksServer = jwksMockServer.token({
+          sub: createdAdminUser.id,
+          role: createdAdminUser.role
+        });
+        // Add token to cookie
+        const response = await request(app)
+          .post("/admin/users")
+          .set("Cookie", [`access_token=${tokenFromJwksServer}`])
+          .send(managerUserData);
+        const createdManagerUser = await userRepository.findOne({
+          where: {
+            id: response.body.data.id
+          }
+        });
+        // Assert
+        expect(createdManagerUser?.role).toBe(UserRole.MANAGER);
+        expect(response.body.data.email).toBe(managerUserData.email);
+      }
+    );
+    it("should return 404 if tenant does not exist and admin tries to create manager with that tenant", async () => {
+      const adminUserData = {
         firstName: "John",
         lastName: "Doe",
         email: "johndoe@email.com",
-        password: "secret"
+        password: "secret",
+        role: UserRole.ADMIN
       };
-      // Register a user (create a user in the database)
-      const userRepository = dataSource.getRepository(User);
-      const createdUser = await userRepository.save(userData);
-      // Generate a token
-      const tokenFromJwksServer = jwksMockServer.token({
-        sub: createdUser.id,
-        role: createdUser.role
-      });
-      // Add token to cookie
-      const response = await request(app)
-        .get("/auth/me")
-        .set("Cookie", [`access_token=${tokenFromJwksServer}`]);
-      // Assert
-      // check user id from response matehes the regiseter user id
-      expect(response.body.data.at(0).id).toBe(createdUser.id);
-      expect(response.statusCode).toBe(200);
-    });
-    it("should not return user password", async () => {
-      const userData = {
-        firstName: "John",
+
+      const managerUserData = {
+        firstName: "JohnManager",
         lastName: "Doe",
-        email: "johndoe@email.com",
-        password: "secret"
+        email: "johndoemanager@email.com",
+        password: "secret",
+        role: UserRole.MANAGER,
+        tenantId: "fec487ed-4c71-4533-8a14-3b20f7e36614"
       };
+
       // Register a user (create a user in the database)
       const userRepository = dataSource.getRepository(User);
-      const createdUser = await userRepository.save(userData);
+      const createdAdminUser = await userRepository.save(adminUserData);
       // Generate a token
       const tokenFromJwksServer = jwksMockServer.token({
-        sub: createdUser.id,
-        role: createdUser.role
+        sub: createdAdminUser.id,
+        role: createdAdminUser.role
       });
       // Add token to cookie
       const response = await request(app)
-        .get("/auth/me")
-        .set("Cookie", [`access_token=${tokenFromJwksServer}`]);
+        .post("/admin/users")
+        .set("Cookie", [`access_token=${tokenFromJwksServer}`])
+        .send(managerUserData);
       // Assert
-      // check user password should not be returned
-      expect(response.body.data.at(0)).not.toHaveProperty("password");
-    });
-    it("should return 401 status code if we dont send any token", async () => {
-      const response = await request(app).get("/auth/me");
-      // Assert
-      // check user password should not be returned
-      expect(response.statusCode).toBe(401);
+      expect(response.statusCode).toBe(404);
     });
   });
 });

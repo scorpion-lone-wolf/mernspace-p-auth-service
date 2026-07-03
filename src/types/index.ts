@@ -1,22 +1,27 @@
 import { Request } from "express";
 import jwt from "jsonwebtoken";
 import z from "zod";
+import { createUserSchema } from "../schemas/createUserSchema";
 import { loginUserSchema } from "../schemas/loginUserSchema";
 import { registerUserSchema } from "../schemas/registerUserSchema";
 import { tenantSchema } from "../schemas/tenantSchema";
 
-export type UserData = z.infer<typeof registerUserSchema>;
+export type RegisterUserData = z.infer<typeof registerUserSchema>;
+export type CreateUserData = z.infer<typeof createUserSchema>;
+
 export type LoginUserData = z.infer<typeof loginUserSchema>;
 
 export type CreateTenantData = z.infer<typeof tenantSchema>;
 
 export interface RegisterUserRequest extends Request {
-  body: UserData;
+  body: RegisterUserData;
 }
 export interface LoginUserRequest extends Request {
   body: LoginUserData;
 }
-
+export interface CreateUserRequest extends Request {
+  body: CreateUserData;
+}
 export type ErrorResponse = {
   type: string;
   message: string;

@@ -7,6 +7,7 @@ import { valdiate } from "../middlewares/validate";
 
 import { AuthController } from "../controllers/authController";
 import { RefreshToken } from "../entities/refreshToken";
+import { Tenant } from "../entities/tenant";
 import { authenticate } from "../middlewares/authenticate";
 import { valdiateRefreshToken } from "../middlewares/validateRefreshToken";
 import { loginUserSchema } from "../schemas/loginUserSchema";
@@ -20,7 +21,8 @@ const authRouter = express.Router();
 const refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
 const tokenService = new TokenService(refreshTokenRepository);
 const userRepository = AppDataSource.getRepository(User);
-const userService = new UserService(userRepository);
+const tenantRepository = AppDataSource.getRepository(Tenant);
+const userService = new UserService(userRepository, tenantRepository);
 const authController = new AuthController(userService, logger, tokenService);
 
 // all the routes realted to auth

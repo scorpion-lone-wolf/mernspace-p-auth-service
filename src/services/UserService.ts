@@ -1,14 +1,32 @@
 import bcrypt from "bcrypt";
 import createHttpError, { HttpError } from "http-errors";
-import { Repository } from "typeorm";
+import { DeepPartial, Repository } from "typeorm";
 import { User } from "../entities/user";
-import { UserData } from "../types";
+import { UserRole } from "../enums";
+import { RegisterUserData } from "../types";
 
+import { Tenant } from "../entities/tenant";
 import { isUniqueConstraintError } from "../utils/index";
-export class UserService {
-  constructor(private userRepository: Repository<User>) {}
 
-  async create({ firstName, lastName, email, password }: UserData) {
+type CreateUserInput = RegisterUserData & {
+  role?: User["role"];
+  tenantId?: string;
+};
+
+export class UserService {
+  constructor(
+    private userRepository: Repository<User>,
+    private tenantRepository: Repository<Tenant>
+  ) {}
+
+  async create({
+    firstName,
+    lastName,
+    email,
+    password,
+    role = UserRole.CUSTOMER,
+    tenantId
+  }: CreateUserInput) {
     try {
       // check if email already exist or not
       const userCount = await this.userRepository.count({
@@ -20,13 +38,30 @@ export class UserService {
       // create a hash password for the user
       const saltRounds = 10;
       const hashPassword = await bcrypt.hash(password, saltRounds);
-      return await this.userRepository.save({
+      const userData: DeepPartial<User> = {
         firstName,
         lastName,
         email,
-        password: hashPassword
-      });
-    } catch (err: unknown) {
+        password: hashPassword,
+        role
+      };
+
+      if (tenantId) {
+        // check if tenant exists
+        const tenant = await this.tenantRepository.findOne({
+          where: { id: tenantId }
+        });
+        if (!tenant) {
+          throw createHttpError(404, "Tenant not found");
+        }
+
+        userData.tenant = tenant;
+      }
+      const user = await this.userRepository.save(userData);
+
+      delete (user as Partial<User>).password;
+      return user;
+    } catch (err) {
       if (
         isUniqueConstraintError(err) ||
         (err instanceof HttpError && err.status === 409)
@@ -34,7 +69,7 @@ export class UserService {
         // duplicate email
         throw createHttpError(409, "Email already exists");
       }
-      throw createHttpError(500, "Failed to store the data in the database");
+      throw err;
     }
   }
 
