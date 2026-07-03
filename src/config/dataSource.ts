@@ -18,7 +18,7 @@ export const AppDataSource = new DataSource({
   synchronize: isTest,
   logging: false,
   entities: [User, RefreshToken, Tenant],
-  migrations: isTest ? [] : [__dirname + "/../migrations/*.ts"],
+  migrations: isTest ? [] : [__dirname + "/../migrations/*.{ts,js}"],
   subscribers: [],
   migrationsRun: false // don't run migration on every app start
 });
