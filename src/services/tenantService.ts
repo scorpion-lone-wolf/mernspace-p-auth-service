@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import { Repository } from "typeorm";
+import { QueryFailedError, Repository } from "typeorm";
 import { Tenant } from "../entities/tenant";
 
 export class TenantService {
@@ -37,10 +37,22 @@ export class TenantService {
   }
 
   async delete(id: string) {
-    const tenant = await this.tenantRepository.findOne({ where: { id } });
-    if (!tenant) {
-      throw createHttpError(404, "Tenant not found");
+    try {
+      const tenant = await this.tenantRepository.findOne({ where: { id } });
+      if (!tenant) {
+        throw createHttpError(404, "Tenant not found");
+      }
+      return await this.tenantRepository.remove(tenant);
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        if (error.driverError.code === "23503") {
+          throw createHttpError(
+            409,
+            "Cannot delete tenant because it has users"
+          );
+        }
+      }
+      throw error;
     }
-    return await this.tenantRepository.remove(tenant);
   }
 }
