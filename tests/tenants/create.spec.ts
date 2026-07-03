@@ -14,7 +14,7 @@ import app from "../../src/app";
 import { AppDataSource } from "../../src/config/dataSource";
 import { Tenant } from "../../src/entities/tenant";
 import { UserRole } from "../../src/enums";
-describe("POST /admin/tenants", () => {
+describe("POST /tenants", () => {
   let dataSource: DataSource;
   let jwksServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -112,6 +112,27 @@ describe("POST /admin/tenants", () => {
       const tenants = await tenantRepository.find();
       expect(tenants.length).toBe(0);
       expect(response.statusCode).toBe(403); // Forbidden
+    });
+  });
+  describe("Given Some fields are missing", () => {
+    it("should return 400 status code if name field is missing", async () => {
+      // prepare
+      const tenantData = {
+        address: "Address-1"
+      };
+      // Act
+      //   Act
+      const accessToken = jwksServer.token({
+        sub: "a17527a0-8c62-4c1b-9819-11b32cae28d8",
+        role: UserRole.ADMIN
+      });
+      const response = await request(app)
+        .post("/tenants")
+        .send(tenantData)
+        .set("Cookie", [`access_token=${accessToken}`]);
+
+      // Assert
+      expect(response.statusCode).toBe(400);
     });
   });
 });

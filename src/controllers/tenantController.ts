@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import createHttpError from "http-errors";
 import { Logger } from "winston";
 import { TenantService } from "../services/tenantService";
 export class TenantController {
@@ -17,6 +18,31 @@ export class TenantController {
         .json({ message: "Tenant created", data: tenantData });
     } catch (error) {
       this.logger.error("Error creating tenant", error);
+      throw error;
+    }
+  }
+
+  async getAll(req: Request, res: Response) {
+    try {
+      const tenants = await this.tenantService.fetchAll();
+      return res.json({
+        data: tenants
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+  async get(req: Request, res: Response) {
+    try {
+      const id = String(req.params.id);
+      if (!id) {
+        throw createHttpError(400, "Tenant id is required");
+      }
+      const tenant = await this.tenantService.fetch(id);
+      return res.json({
+        data: tenant
+      });
+    } catch (error) {
       throw error;
     }
   }

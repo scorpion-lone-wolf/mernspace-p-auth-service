@@ -27,4 +27,17 @@ tenantRouter.post(
   (req, res) => tenantController.create(req, res)
 );
 
+tenantRouter.get(
+  "/",
+  authenticate,
+  authorized([UserRole.ADMIN]), // aurthorized only for admin
+  (req, res) => tenantController.getAll(req, res)
+);
+tenantRouter.get(
+  "/:id",
+  authenticate,
+  authorized([UserRole.ADMIN]), // aurthorized only for admin
+  (req, res) => tenantController.get(req, res)
+);
+
 export default tenantRouter;
