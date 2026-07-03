@@ -5,9 +5,11 @@ import { createUserSchema } from "../schemas/createUserSchema";
 import { loginUserSchema } from "../schemas/loginUserSchema";
 import { registerUserSchema } from "../schemas/registerUserSchema";
 import { tenantSchema } from "../schemas/tenantSchema";
+import { updateUserSchema } from "../schemas/updateUserSchema";
 
 export type RegisterUserData = z.infer<typeof registerUserSchema>;
 export type CreateUserData = z.infer<typeof createUserSchema>;
+export type UpdateUserData = z.infer<typeof updateUserSchema>;
 
 export type LoginUserData = z.infer<typeof loginUserSchema>;
 
@@ -22,6 +24,10 @@ export interface LoginUserRequest extends Request {
 export interface CreateUserRequest extends Request {
   body: CreateUserData;
 }
+export interface UpdateUserRequest extends Request {
+  body: UpdateUserData;
+}
+
 export type ErrorResponse = {
   type: string;
   message: string;

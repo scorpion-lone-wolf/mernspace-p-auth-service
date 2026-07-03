@@ -6,7 +6,8 @@ import { Tenant } from "../entities/tenant";
 import { UserRole } from "../enums";
 import { authenticate } from "../middlewares/authenticate";
 import authorized from "../middlewares/authorized";
-import { valdiate } from "../middlewares/validate";
+import { valdiate, validateParams } from "../middlewares/validate";
+import { idParamSchema } from "../schemas/paramsSchema";
 import { tenantSchema } from "../schemas/tenantSchema";
 import updateTenantSchema from "../schemas/updateTenantSchema";
 import { TenantService } from "../services/tenantService";
@@ -38,14 +39,16 @@ tenantRouter.get(
   "/:id",
   authenticate,
   authorized([UserRole.ADMIN]), // aurthorized only for admin
+  validateParams(idParamSchema),
   (req, res) => tenantController.get(req, res)
 );
 
 tenantRouter.patch(
   "/:id",
-  valdiate(updateTenantSchema),
   authenticate,
   authorized([UserRole.ADMIN]), // aurthorized only for admin
+  validateParams(idParamSchema),
+  valdiate(updateTenantSchema),
   (req, res) => tenantController.update(req, res)
 );
 
@@ -53,6 +56,7 @@ tenantRouter.delete(
   "/:id",
   authenticate,
   authorized([UserRole.ADMIN]), // aurthorized only for admin
+  validateParams(idParamSchema),
   (req, res) => tenantController.delete(req, res)
 );
 

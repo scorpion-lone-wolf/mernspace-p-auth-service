@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import createHttpError from "http-errors";
 import { UserService } from "../services/userService";
-import { CreateUserData, CreateUserRequest } from "../types";
+import { CreateUserData, CreateUserRequest, UpdateUserRequest } from "../types";
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -49,15 +49,14 @@ export class UserController {
         message: "Users fetched successfully",
         data: users
       });
-    } catch (error) {}
+    } catch (error) {
+      throw error;
+    }
   }
   async get(req: Request, res: Response) {
     try {
-      const id = req.params.id;
-      if (!id) {
-        throw createHttpError(400, "User id is required");
-      }
-      const users = await this.userService.fetch(String(id));
+      const id = String(req.params.id);
+      const users = await this.userService.fetch(id);
       return res.json({
         message: "Users fetched successfully",
         data: users
@@ -67,13 +66,38 @@ export class UserController {
     }
   }
 
+  async update(req: UpdateUserRequest, res: Response) {
+    try {
+      const id = String(req.params.id);
+      // check at least one field is ask to be updated
+      if (Object.keys(req.body).length === 0) {
+        throw createHttpError(400, "At least one field is required to update");
+      }
+      const { firstName, lastName, email, role, tenantId } = req.body;
+      const user = await this.userService.update(id, {
+        firstName,
+        lastName,
+        email,
+        role,
+        tenantId
+      });
+      return res.json({
+        message: "User updated",
+        data: user
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
   async delete(req: Request, res: Response) {
     try {
-      const id = req.params.id;
-      if (!id) {
-        throw createHttpError(400, "User id is required");
+      const id = String(req.params.id);
+      // check if admin user wants to delete themselves or not
+      const adminUserId = req.user?.sub;
+      if (id === adminUserId) {
+        throw createHttpError(400, "You can't delete yourself");
       }
-      const user = await this.userService.delete(String(id));
+      const user = await this.userService.delete(id);
       return res.json({
         message: "User deleted",
         data: user

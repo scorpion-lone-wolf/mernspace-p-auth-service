@@ -15,29 +15,22 @@ import { AppDataSource } from "../../src/config/dataSource";
 import { User } from "../../src/entities/user";
 import { UserRole } from "../../src/enums";
 
-describe("DELETE /admin/users/id", () => {
+describe("DELETE /admin/users/:id", () => {
   let dataSource: DataSource;
   let jwksMockServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
 
   beforeAll(async () => {
     dataSource = await AppDataSource.initialize();
-    // creating the jwks server
-    // Here this will run a mock server and we can simulate of getting pubic key from this server
-    // We did this beacuse we don't want to run actual express server
-    // now when in middleware where we validate the token , we will use jwtsClient to get the kid that was set in header of the token.
-    // we will mention the URI where to get is from. This mock server is running on same address
-    //  by default it exposes "/.well-known.jwks.json"
     jwksMockServer = createJWKSMock("http://localhost:5501");
   });
 
   beforeEach(async () => {
     jwksCleanup = jwksMockServer.start();
-    // drop the database (this will not remove the database , instead it will remove all the tables in the database)
     await dataSource.dropDatabase();
-    // synchronize all the tables in the database
     await dataSource.synchronize();
   });
+
   afterEach(async () => {
     jwksCleanup();
   });
@@ -45,104 +38,96 @@ describe("DELETE /admin/users/id", () => {
   afterAll(async () => {
     await dataSource.destroy();
   });
-  describe("Given user is logged", () => {
-    it("should return 200 status code", async () => {
-      // Prepare
-      const adminUserData = {
-        firstName: "Admin",
-        lastName: "admin",
-        email: "admin@example.com",
-        password: "admin123",
-        role: UserRole.ADMIN
-      };
-      const managerUserData = {
-        firstName: "Manager",
-        lastName: "manager",
-        email: "manager@example.com",
-        password: "manager123",
-        role: UserRole.MANAGER
-      };
-      const userRepository = dataSource.getRepository(User);
-      const createdAdminUser = await userRepository.save(adminUserData);
-      const createManagerUser = await userRepository.save(managerUserData);
-      const adminToken = jwksMockServer.token({
-        sub: createdAdminUser.id,
-        role: createdAdminUser.role
-      });
-      //   Act
-      const response = await request(app)
-        .delete(`/admin/users/${createManagerUser.id}`)
-        .set("Cookie", [`access_token=${adminToken}`]);
-      //  Assert
-      expect(response.statusCode).toBe(200);
-    });
-    it("should delete particular user from the database", async () => {
-      // Prepare
-      const adminUserData = {
-        firstName: "Admin",
-        lastName: "admin",
-        email: "admin@example.com",
-        password: "admin123",
-        role: UserRole.ADMIN
-      };
-      const managerUserData = {
-        firstName: "Manager",
-        lastName: "manager",
-        email: "manager@example.com",
-        password: "manager123",
-        role: UserRole.MANAGER
-      };
-      const userRepository = dataSource.getRepository(User);
-      const createdAdminUser = await userRepository.save(adminUserData);
-      const createManagerUser = await userRepository.save(managerUserData);
 
-      const adminToken = jwksMockServer.token({
-        sub: createdAdminUser.id,
-        role: createdAdminUser.role
-      });
-      //   Act
-      const response = await request(app)
-        .delete(`/admin/users/${createManagerUser.id}`)
-        .set("Cookie", [`access_token=${adminToken}`]);
-      //  Assert
-      const user = await userRepository.findOne({
-        where: { id: createManagerUser.id }
-      });
-      expect(user).toBeNull();
-      expect(response.body.message).toBe("User deleted");
+  const createUser = async (role: UserRole, email: string) => {
+    return dataSource.getRepository(User).save({
+      firstName: "User",
+      lastName: "User",
+      email,
+      password: "secret123",
+      role
     });
-    it("should return 403 if user is not authorized", async () => {
-      // Prepare
-      const userData = {
-        firstName: "Admin",
-        lastName: "admin",
-        email: "admin@example.com",
-        password: "admin123",
-        role: UserRole.MANAGER
-      };
-      const managerUserData = {
-        firstName: "Manager",
-        lastName: "manager",
-        email: "manager@example.com",
-        password: "manager123",
-        role: UserRole.MANAGER
-      };
-      const userRepository = dataSource.getRepository(User);
-      const createdUser = await userRepository.save(userData);
-      const createManagerUser = await userRepository.save(managerUserData);
-      const user = await userRepository.findOne({
-        where: { id: createManagerUser.id }
-      });
-      const adminToken = jwksMockServer.token({
-        sub: createdUser.id,
-        role: createdUser.role
-      });
-      //   Act
-      const response = await request(app)
-        .delete(`/admin/users/${createManagerUser.id}`)
-        .set("Cookie", [`access_token=${adminToken}`]);
-      //  Assert
-      expect(response.statusCode).toBe(403);
+  };
+
+  const tokenFor = (user: User) => {
+    return jwksMockServer.token({
+      sub: user.id,
+      role: user.role
     });
+  };
+
+  it("should delete a user and return deleted user data", async () => {
+    const admin = await createUser(UserRole.ADMIN, "admin@example.com");
+    const manager = await createUser(UserRole.MANAGER, "manager@example.com");
+    const adminToken = tokenFor(admin);
+
+    const response = await request(app)
+      .delete(`/admin/users/${manager.id}`)
+      .set("Cookie", [`access_token=${adminToken}`]);
+
+    const user = await dataSource.getRepository(User).findOne({
+      where: { id: manager.id }
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.message).toBe("User deleted");
+    expect(response.body.data.id).toBe(manager.id);
+    expect(response.body.data).not.toHaveProperty("password");
+    expect(user).toBeNull();
+  });
+
+  it("should return 401 if user is not authenticated", async () => {
+    const manager = await createUser(UserRole.MANAGER, "manager@example.com");
+
+    const response = await request(app).delete(`/admin/users/${manager.id}`);
+
+    expect(response.statusCode).toBe(401);
+  });
+
+  it("should return 403 if user is not admin", async () => {
+    const nonAdmin = await createUser(UserRole.MANAGER, "notadmin@example.com");
+    const manager = await createUser(UserRole.MANAGER, "manager@example.com");
+    const token = tokenFor(nonAdmin);
+
+    const response = await request(app)
+      .delete(`/admin/users/${manager.id}`)
+      .set("Cookie", [`access_token=${token}`]);
+
+    expect(response.statusCode).toBe(403);
+  });
+
+  it("should return 400 for invalid user id", async () => {
+    const admin = await createUser(UserRole.ADMIN, "admin@example.com");
+    const adminToken = tokenFor(admin);
+
+    const response = await request(app)
+      .delete("/admin/users/not-a-uuid")
+      .set("Cookie", [`access_token=${adminToken}`]);
+
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("should return 404 if user is not found", async () => {
+    const admin = await createUser(UserRole.ADMIN, "admin@example.com");
+    const adminToken = tokenFor(admin);
+
+    const response = await request(app)
+      .delete("/admin/users/a17527a0-8c62-4c1b-9819-11b32cae28d8")
+      .set("Cookie", [`access_token=${adminToken}`]);
+
+    expect(response.statusCode).toBe(404);
+  });
+
+  it("should return 400 if admin user wants to delete themselves", async () => {
+    // Prepare
+    const adminUser = await createUser(UserRole.ADMIN, "admin@example.com");
+    const adminToken = tokenFor(adminUser);
+    // Act
+    const response = await request(app)
+      .delete(`/admin/users/${adminUser.id}`)
+      .set("Cookie", [`access_token=${adminToken}`]);
+
+    // Assert
+    expect(response.statusCode).toBe(400);
+    expect(response.body.errors[0].message).toBe("You can't delete yourself");
   });
 });
