@@ -4,6 +4,7 @@ import { HttpError } from "http-errors";
 import "reflect-metadata";
 import logger from "./config/logger";
 import authRouter from "./routes/auth";
+import publicTenantRouter from "./routes/publicTenant";
 import tenantRouter from "./routes/tenant";
 import userRouter from "./routes/user";
 
@@ -23,6 +24,7 @@ app.get("/", async (req, res, next) => {
 app.use("/auth", authRouter);
 
 // admin routes
+app.use("/tenants", publicTenantRouter);
 app.use("/admin/tenants", tenantRouter);
 app.use("/admin/users", userRouter);
 
