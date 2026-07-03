@@ -9,6 +9,7 @@
   "scripts": {
     "test:watch": "vitest",
     "test:once": "vitest run ",
+    "test:coverage": "vitest run --coverage",
     "dev": "cross-env NODE_ENV=development nodemon --files src/server.ts",
     "format:fix": "npx prettier . --write",
     "format:check": "npx prettier . --check",
@@ -38,6 +39,7 @@
     "@types/node": "^26.0.1",
     "@types/sanitize-html": "^2.16.1",
     "@types/supertest": "^7.2.0",
+    "@vitest/coverage-v8": "^4.1.9",
     "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
     "eslint": "^10.5.0",
