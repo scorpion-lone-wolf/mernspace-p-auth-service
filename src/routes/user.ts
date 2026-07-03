@@ -24,5 +24,11 @@ userRouter.post(
   valdiate(createUserSchema),
   (req, res) => userController.create(req, res)
 );
+userRouter.get("/", authenticate, authorized([UserRole.ADMIN]), (req, res) =>
+  userController.getAll(req, res)
+);
+userRouter.get("/:id", authenticate, authorized([UserRole.ADMIN]), (req, res) =>
+  userController.get(req, res)
+);
 
 export default userRouter;

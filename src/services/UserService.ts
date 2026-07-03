@@ -107,4 +107,22 @@ export class UserService {
       where: { id: id }
     });
   }
+
+  async fetchAll(page: number, limit: number): Promise<User[]> {
+    const users = await this.userRepository.find({
+      skip: (page - 1) * limit, //offset
+      take: limit
+    });
+    return users;
+  }
+
+  async fetch(id: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id }
+    });
+    if (!user) {
+      throw createHttpError(404, "User not found");
+    }
+    return user;
+  }
 }

@@ -1,4 +1,5 @@
-import { Response } from "express";
+import { Request, Response } from "express";
+import createHttpError from "http-errors";
 import { UserService } from "../services/userService";
 import { CreateUserData, CreateUserRequest } from "../types";
 
@@ -32,6 +33,34 @@ export class UserController {
       res.status(201).json({
         message: "User created successfully",
         data: createdUser
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAll(req: Request, res: Response) {
+    try {
+      const { page = 1, limit = 10 } = req.query;
+      const pageNumber = Math.max(1, Number(page) || 1);
+      const limitNumber = Math.max(1, Number(limit) || 10);
+      const users = await this.userService.fetchAll(+pageNumber, +limitNumber);
+      return res.json({
+        message: "Users fetched successfully",
+        data: users
+      });
+    } catch (error) {}
+  }
+  async get(req: Request, res: Response) {
+    try {
+      const id = req.params.id;
+      if (!id) {
+        throw createHttpError(400, "User id is required");
+      }
+      const users = await this.userService.fetch(String(id));
+      return res.json({
+        message: "Users fetched successfully",
+        data: users
       });
     } catch (error) {
       throw error;
