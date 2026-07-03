@@ -66,4 +66,20 @@ export class UserController {
       throw error;
     }
   }
+
+  async delete(req: Request, res: Response) {
+    try {
+      const id = req.params.id;
+      if (!id) {
+        throw createHttpError(400, "User id is required");
+      }
+      const user = await this.userService.delete(String(id));
+      return res.json({
+        message: "User deleted",
+        data: user
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 }

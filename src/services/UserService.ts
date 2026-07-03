@@ -125,4 +125,13 @@ export class UserService {
     }
     return user;
   }
+
+  async delete(id: string) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw createHttpError(404, "User not found");
+    }
+    const deletedUser = await this.userRepository.delete({ id });
+    return deletedUser;
+  }
 }

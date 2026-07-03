@@ -30,5 +30,11 @@ userRouter.get("/", authenticate, authorized([UserRole.ADMIN]), (req, res) =>
 userRouter.get("/:id", authenticate, authorized([UserRole.ADMIN]), (req, res) =>
   userController.get(req, res)
 );
+userRouter.delete(
+  "/:id",
+  authenticate,
+  authorized([UserRole.ADMIN]),
+  (req, res) => userController.delete(req, res)
+);
 
 export default userRouter;
