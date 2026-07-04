@@ -1,5 +1,6 @@
 # 1. use offical Node.js LTS image
-FROM node:lts-alpine
+FROM node:trixie-slim
+
 
 # 2. set working directory inside container
 WORKDIR /usr/src/app

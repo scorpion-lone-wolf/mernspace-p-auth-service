@@ -1,4 +1,4 @@
-FROM node:lts-alpine as builder
+FROM node:trixie-slim as builder
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY . .
 
 RUN npm run build
 # ========================================
-FROM node:lts-alpine as production
+FROM node:trixie-slim as production
 
 ENV NODE_ENV=production
 
