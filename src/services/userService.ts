@@ -15,8 +15,8 @@ type CreateUserInput = RegisterUserData & {
 
 export class UserService {
   constructor(
-    private userRepository: Repository<User>,
-    private tenantRepository: Repository<Tenant>
+    private readonly userRepository: Repository<User>,
+    private readonly tenantRepository: Repository<Tenant>
   ) {}
 
   private removePassword(user: User) {

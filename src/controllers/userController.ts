@@ -4,7 +4,7 @@ import { UserService } from "../services/userService";
 import { CreateUserData, CreateUserRequest, UpdateUserRequest } from "../types";
 
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   async create(req: CreateUserRequest, res: Response) {
     try {

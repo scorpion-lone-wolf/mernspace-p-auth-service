@@ -4,8 +4,8 @@ import { Logger } from "winston";
 import { TenantService } from "../services/tenantService";
 export class TenantController {
   constructor(
-    private tenantService: TenantService,
-    private logger: Logger
+    private readonly tenantService: TenantService,
+    private readonly logger: Logger
   ) {}
 
   async create(req: Request, res: Response) {

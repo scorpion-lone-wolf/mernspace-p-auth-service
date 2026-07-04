@@ -6,7 +6,9 @@ import { Config } from "../config";
 import { RefreshToken } from "../entities/refreshToken";
 import { User } from "../entities/user";
 export class TokenService {
-  constructor(private refreshTokenRepository: Repository<RefreshToken>) {}
+  constructor(
+    private readonly refreshTokenRepository: Repository<RefreshToken>
+  ) {}
 
   async generateAccessToken(logger: Logger, user: User) {
     let privateKey: string;
