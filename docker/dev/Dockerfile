@@ -1,21 +1,29 @@
-# 1. use offical Node.js LTS image
-FROM node:trixie-slim
+FROM node:trixie-slim as builder
 
+WORKDIR /app
 
-# 2. set working directory inside container
-WORKDIR /usr/src/app
-
-# 3. copy packages file first
 COPY package*.json ./
 
-# 4. install dependencies
-RUN npm install
+RUN npm ci
 
-# 5. copy source code
 COPY . .
 
-# 6. expose port
+RUN npm run build
+# ========================================
+FROM node:trixie-slim as dev
+
+ENV NODE_ENV=development
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm ci --ignore-scripts
+
+COPY --from=builder --chown=node:node  /app/dist ./
+
 EXPOSE 5501
 
-# 7. run app
-CMD ["npm" ,"run","dev"]
+USER node
+
+CMD ["node" , "src/server.js"]
