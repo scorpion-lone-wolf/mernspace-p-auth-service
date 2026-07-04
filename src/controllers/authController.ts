@@ -11,9 +11,9 @@ import { setAuthCookies } from "../utils/authCookies";
 export class AuthController {
   hourInMilliSeconds = 1000 * 60 * 60; // 1 hr in milliseconds
   constructor(
-    private userService: UserService,
-    private logger: Logger,
-    private tokenService: TokenService
+    private readonly userService: UserService,
+    private readonly logger: Logger,
+    private readonly tokenService: TokenService
   ) {}
   async register(req: RegisterUserRequest, res: Response) {
     // Step 1: Getting json body from request
