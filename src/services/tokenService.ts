@@ -1,7 +1,5 @@
 import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
-import fs from "node:fs/promises";
-import path from "node:path";
 import { MoreThan, Repository } from "typeorm";
 import { Logger } from "winston";
 import { Config } from "../config";
@@ -13,10 +11,7 @@ export class TokenService {
   async generateAccessToken(logger: Logger, user: User) {
     let privateKey: string;
     try {
-      privateKey = await fs.readFile(
-        path.join(__dirname, "../../keys/private.pem"),
-        "utf-8"
-      );
+      privateKey = Config.PRIVATE_KEY;
     } catch (error) {
       console.log("err", error);
       logger.error("Failed to read key", { error });
