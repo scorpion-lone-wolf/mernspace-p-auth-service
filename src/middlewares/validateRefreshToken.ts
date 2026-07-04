@@ -26,6 +26,9 @@ export const valdiateRefreshToken = async (
     req.user = verifiedToken as TokenPayload;
     next();
   } catch (error) {
-    throw createHttpError(401, "Unauthorized");
+    if (error instanceof createHttpError.HttpError) {
+      throw createHttpError(401, "Unauthorized");
+    }
+    throw error;
   }
 };

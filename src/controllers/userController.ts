@@ -1,10 +1,14 @@
 import { Request, Response } from "express";
 import createHttpError from "http-errors";
+import { Logger } from "winston";
 import { UserService } from "../services/userService";
 import { CreateUserData, CreateUserRequest, UpdateUserRequest } from "../types";
 
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly logger: Logger
+  ) {}
 
   async create(req: CreateUserRequest, res: Response) {
     try {
@@ -35,6 +39,7 @@ export class UserController {
         data: createdUser
       });
     } catch (error) {
+      this.logger.error("Error registering user", error);
       throw error;
     }
   }
@@ -50,6 +55,7 @@ export class UserController {
         data: users
       });
     } catch (error) {
+      this.logger.error("Error registering user", error);
       throw error;
     }
   }
@@ -62,6 +68,7 @@ export class UserController {
         data: users
       });
     } catch (error) {
+      this.logger.error("Error registering user", error);
       throw error;
     }
   }
@@ -86,6 +93,7 @@ export class UserController {
         data: user
       });
     } catch (error) {
+      this.logger.error("Error registering user", error);
       throw error;
     }
   }
@@ -103,6 +111,7 @@ export class UserController {
         data: user
       });
     } catch (error) {
+      this.logger.error("Error registering user", error);
       throw error;
     }
   }

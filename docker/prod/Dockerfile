@@ -1,4 +1,4 @@
-FROM node:trixie-slim as builder
+FROM node:trixie-slim AS builder
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY . .
 
 RUN npm run build
 # ========================================
-FROM node:trixie-slim as production
+FROM node:trixie-slim AS production
 
 ENV NODE_ENV=production
 

@@ -9,6 +9,8 @@ import tenantRouter from "./routes/tenant";
 import userRouter from "./routes/user";
 
 const app = expres();
+app.disable("x-powered-by"); // disable x-powered-by so that attacker will not know the server uses express
+
 // make sure json data is available in req.body
 app.use(expres.json());
 // make sure cookie data is available in req.cookies

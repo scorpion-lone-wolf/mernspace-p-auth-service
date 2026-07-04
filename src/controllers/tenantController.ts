@@ -37,6 +37,7 @@ export class TenantController {
         data: tenants
       });
     } catch (error) {
+      this.logger.error("Error registering user", error);
       throw error;
     }
   }
@@ -52,6 +53,7 @@ export class TenantController {
         data: tenant
       });
     } catch (error) {
+      this.logger.error("Error registering user", error);
       throw error;
     }
   }
@@ -72,6 +74,7 @@ export class TenantController {
         data: tenant
       });
     } catch (error) {
+      this.logger.error("Error registering user", error);
       throw error;
     }
   }
@@ -88,6 +91,7 @@ export class TenantController {
         data: tenant
       });
     } catch (error) {
+      this.logger.error("Error registering user", error);
       throw error;
     }
   }

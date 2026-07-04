@@ -67,6 +67,7 @@ export class AuthController {
         ]
       });
     } catch (error) {
+      this.logger.error("Error registering user", error);
       throw error;
     }
   }
@@ -110,6 +111,7 @@ export class AuthController {
         .status(200)
         .json({ data: [{ id: user.id }], message: "Login successful" });
     } catch (error) {
+      this.logger.error("Error registering user", error);
       throw error;
     }
   }
@@ -137,6 +139,7 @@ export class AuthController {
         ]
       });
     } catch (error) {
+      this.logger.error("Error registering user", error);
       throw error;
     }
   }
