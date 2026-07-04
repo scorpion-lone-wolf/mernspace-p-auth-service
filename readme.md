@@ -2,7 +2,8 @@
 
 ## TypeORM Migrations
 
-Migrations are versioned database changes. In this project, entity changes are converted into migration files under:
+Migration are file data tells how the database tables,constraints changes over times.
+We run all the migration in same order so that we reach to same db state that is working in development
 
 ```txt
 src/migrations/
