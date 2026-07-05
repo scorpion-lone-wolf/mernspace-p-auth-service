@@ -1,6 +1,5 @@
 import express from "express";
 import { AppDataSource } from "../config/dataSource";
-import logger from "../config/logger";
 import { UserController } from "../controllers/userController";
 import { Tenant } from "../entities/tenant";
 import { User } from "../entities/user";
@@ -18,7 +17,7 @@ const tenantRepository = AppDataSource.getRepository(Tenant);
 const userRepository = AppDataSource.getRepository(User);
 const userService = new UserService(userRepository, tenantRepository);
 // dependencies
-const userController = new UserController(userService, logger);
+const userController = new UserController(userService);
 
 userRouter.post(
   "/",
