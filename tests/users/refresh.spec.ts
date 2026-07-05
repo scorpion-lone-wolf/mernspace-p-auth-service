@@ -4,6 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import app from "../../src/app";
 import { AppDataSource } from "../../src/config/dataSource";
 import { RefreshToken } from "../../src/entities/refreshToken";
+import { Tenant } from "../../src/entities/tenant";
 import { User } from "../../src/entities/user";
 import { TokenService } from "../../src/services/tokenService";
 import { UserService } from "../../src/services/userService";
@@ -14,7 +15,10 @@ describe("POST /auth/refresh", () => {
   let tokenService: TokenService;
   beforeAll(async () => {
     dataSource = await AppDataSource.initialize();
-    userService = new UserService(dataSource.getRepository(User));
+    userService = new UserService(
+      dataSource.getRepository(User),
+      dataSource.getRepository(Tenant)
+    );
     tokenService = new TokenService(dataSource.getRepository(RefreshToken));
   });
 

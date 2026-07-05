@@ -24,9 +24,13 @@ export const valdiateRefreshToken = async (
       throw createHttpError(401, "Unauthorized");
     }
     req.user = verifiedToken as TokenPayload;
+
     next();
   } catch (error) {
-    if (error instanceof createHttpError.HttpError) {
+    if (
+      error instanceof createHttpError.HttpError ||
+      error instanceof jwt.JsonWebTokenError
+    ) {
       throw createHttpError(401, "Unauthorized");
     }
     throw error;
