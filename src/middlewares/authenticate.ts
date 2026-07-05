@@ -58,6 +58,9 @@ export const authenticate = async (
     req.user = verifiedToken as TokenPayload;
     return next();
   } catch (error) {
+    if (error instanceof jwt.JsonWebTokenError) {
+      throw createHttpError(401, "Unauthorized");
+    }
     throw error;
   }
 };

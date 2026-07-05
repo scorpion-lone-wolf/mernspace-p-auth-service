@@ -26,7 +26,7 @@ jobs:
         run: npm run lint
 
       - name: Run tests
-        run: npm run test:once
+        run: npm run test:coverage
         env:
           PORT: 5501
           DB_HOST: ${{ secrets.TEST_DB_HOST }}

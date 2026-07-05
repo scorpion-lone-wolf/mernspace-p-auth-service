@@ -1,4 +1,4 @@
-FROM node:trixie-slim as builder
+FROM node:trixie-slim AS builder
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY . .
 
 RUN npm run build
 # ========================================
-FROM node:trixie-slim as dev
+FROM node:trixie-slim AS dev
 
 ENV NODE_ENV=development
 
@@ -20,7 +20,6 @@ COPY package*.json ./
 
 RUN npm ci --ignore-scripts
 
-COPY --from=builder --chown=node:node  /app/dist ./
 
 EXPOSE 5501
 

@@ -26,119 +26,107 @@ export class AuthController {
       password: "*********"
     });
 
-    try {
-      // Step 2: Create user
-      const user = await this.userService.create({
-        firstName,
-        lastName,
-        email,
-        password,
-        role: UserRole.CUSTOMER
-      });
-      this.logger.info("User registered successfully", { id: user.id });
+    // Step 2: Create user
+    const user = await this.userService.create({
+      firstName,
+      lastName,
+      email,
+      password,
+      role: UserRole.CUSTOMER
+    });
+    this.logger.info("User registered successfully", { id: user.id });
 
-      // Step 3: Generate access_token and refresh_token
-      const accessToken = await this.tokenService.generateAccessToken(
-        this.logger,
-        user
-      );
+    // Step 3: Generate access_token and refresh_token
+    const accessToken = await this.tokenService.generateAccessToken(
+      this.logger,
+      user
+    );
 
-      // adding an entry in refresh_token table for the user
-      const newRefreshTokenEntry = await this.tokenService.persistRefreshToken(
-        user,
-        this.hourInMilliSeconds
-      );
-      const refreshToken = await this.tokenService.generateRefreshToken(
-        user,
-        newRefreshTokenEntry
-      );
+    // adding an entry in refresh_token table for the user
+    const newRefreshTokenEntry = await this.tokenService.persistRefreshToken(
+      user,
+      this.hourInMilliSeconds
+    );
+    const refreshToken = await this.tokenService.generateRefreshToken(
+      user,
+      newRefreshTokenEntry
+    );
 
-      // Set cookies in response to include access_token and refresh_token
-      setAuthCookies(res, accessToken, refreshToken, this.hourInMilliSeconds);
+    // Set cookies in response to include access_token and refresh_token
+    setAuthCookies(res, accessToken, refreshToken, this.hourInMilliSeconds);
 
-      // Step 5: Send response to the user
-      res.status(201).json({
-        data: [
-          {
-            id: user.id,
-            firstName: user.firstName,
-            email: user.email
-          }
-        ]
-      });
-    } catch (error) {
-      throw error;
-    }
+    // Step 5: Send response to the user
+    res.status(201).json({
+      data: [
+        {
+          id: user.id,
+          firstName: user.firstName,
+          email: user.email
+        }
+      ]
+    });
   }
 
   async login(req: LoginUserRequest, res: Response) {
-    try {
-      // Get the email and password from request body
-      const { email, password } = req.body;
-      this.logger.info("New Request to login user", {
-        email: email,
-        password: "*********"
-      });
-      // TODO :
-      // A single  user can have only 2 refresh tokens at a time
-      // So if user tries to login , and we found that he already has 2 refresh tokens in RefreshToken table
-      // Then we will delete one from RefreshToken table
-      // and then proceed to login the user
+    // Get the email and password from request body
+    const { email, password } = req.body;
+    this.logger.info("New Request to login user", {
+      email: email,
+      password: "*********"
+    });
+    // TODO :
+    // A single  user can have only 2 refresh tokens at a time
+    // So if user tries to login , and we found that he already has 2 refresh tokens in RefreshToken table
+    // Then we will delete one from RefreshToken table
+    // and then proceed to login the user
 
-      const user = await this.userService.login({ email, password });
+    const user = await this.userService.login({ email, password });
 
-      const accessToken = await this.tokenService.generateAccessToken(
-        this.logger,
-        user
-      );
+    const accessToken = await this.tokenService.generateAccessToken(
+      this.logger,
+      user
+    );
 
-      // adding an entry in refresh_token table for the user
-      const newRefreshTokenEntry = await this.tokenService.persistRefreshToken(
-        user,
-        this.hourInMilliSeconds
-      );
-      const refreshToken = await this.tokenService.generateRefreshToken(
-        user,
-        newRefreshTokenEntry
-      );
+    // adding an entry in refresh_token table for the user
+    const newRefreshTokenEntry = await this.tokenService.persistRefreshToken(
+      user,
+      this.hourInMilliSeconds
+    );
+    const refreshToken = await this.tokenService.generateRefreshToken(
+      user,
+      newRefreshTokenEntry
+    );
 
-      // Step 4: Set cookies in response to include access_token and refresh_token
-      setAuthCookies(res, accessToken, refreshToken, this.hourInMilliSeconds);
+    // Step 4: Set cookies in response to include access_token and refresh_token
+    setAuthCookies(res, accessToken, refreshToken, this.hourInMilliSeconds);
 
-      this.logger.info("User logged in successfully", { id: user.id });
-      return res
-        .status(200)
-        .json({ data: [{ id: user.id }], message: "Login successful" });
-    } catch (error) {
-      throw error;
-    }
+    this.logger.info("User logged in successfully", { id: user.id });
+    return res
+      .status(200)
+      .json({ data: [{ id: user.id }], message: "Login successful" });
   }
 
   async me(req: Request, res: Response) {
-    try {
-      const { sub } = req?.user || {};
-      if (!sub) {
-        throw createHttpError(401, "Unauthorized");
-      }
-      // check if the user exist with this id or not , if so return the user
-      const user = await this.userService.getUserById(sub);
-      if (!user) {
-        throw createHttpError(404, "User not found");
-      }
-      return res.status(200).json({
-        data: [
-          {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            role: user.role,
-            email: user.email
-          }
-        ]
-      });
-    } catch (error) {
-      throw error;
+    const { sub } = req?.user || {};
+    if (!sub) {
+      throw createHttpError(401, "Unauthorized");
     }
+    // check if the user exist with this id or not , if so return the user
+    const user = await this.userService.getUserById(sub);
+    if (!user) {
+      throw createHttpError(404, "User not found");
+    }
+    return res.status(200).json({
+      data: [
+        {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          email: user.email
+        }
+      ]
+    });
   }
 
   async refresh(req: Request, res: Response) {

@@ -3,7 +3,7 @@ import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
 import { Config } from "../config";
 import { TokenPayload } from "../types";
-export const valdiateRefreshToken = async (
+export const validateRefreshToken = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -24,8 +24,15 @@ export const valdiateRefreshToken = async (
       throw createHttpError(401, "Unauthorized");
     }
     req.user = verifiedToken as TokenPayload;
+
     next();
   } catch (error) {
-    throw createHttpError(401, "Unauthorized");
+    if (
+      error instanceof createHttpError.HttpError ||
+      error instanceof jwt.JsonWebTokenError
+    ) {
+      throw createHttpError(401, "Unauthorized");
+    }
+    throw error;
   }
 };
