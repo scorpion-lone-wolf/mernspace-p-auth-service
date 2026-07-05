@@ -3,7 +3,7 @@ import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
 import { Config } from "../config";
 import { TokenPayload } from "../types";
-export const valdiateRefreshToken = async (
+export const validateRefreshToken = async (
   req: Request,
   res: Response,
   next: NextFunction
