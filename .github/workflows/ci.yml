@@ -39,6 +39,8 @@ jobs:
           ACCESS_TOKEN_VALIDITY_IN_HOURS: 5
           JWKS_URI: ${{ secrets.TEST_JWKS_URI }}
           PRIVATE_KEY: ${{ secrets.TEST_PRIVATE_KEY }}
+          ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
 
       - name: Build application
         run: npm run build
