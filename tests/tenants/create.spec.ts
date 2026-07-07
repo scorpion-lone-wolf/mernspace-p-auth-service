@@ -69,7 +69,7 @@ describe("POST /tenants", () => {
         sub: "a17527a0-8c62-4c1b-9819-11b32cae28d8",
         role: UserRole.ADMIN
       });
-      const response = await request(app)
+      await request(app)
         .post("/tenants")
         .send(tenantData)
         .set("Cookie", [`access_token=${accessToken}`]);

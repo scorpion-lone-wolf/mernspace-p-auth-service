@@ -158,11 +158,6 @@ describe("GET /tenants/:id", () => {
       expect(response.body.data.name).toBe(tenantData.name);
     });
     it("should return 404 if tenant not found", async () => {
-      // Prepare
-      const tenantData = {
-        name: "Tenant-1",
-        address: "Address-1"
-      };
       //   Act
       const accessToken = jwksServer.token({
         sub: "a17527a0-8c62-4c1b-9819-11b32cae28d8",
