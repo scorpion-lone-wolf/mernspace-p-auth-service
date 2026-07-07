@@ -33,7 +33,9 @@ const config = {
     requiredEnv("ACCESS_TOKEN_VALIDITY_IN_HOURS")
   ),
   JWKS_URI: requiredEnv("JWKS_URI"),
-  PRIVATE_KEY: requiredEnv("PRIVATE_KEY")
+  PRIVATE_KEY: requiredEnv("PRIVATE_KEY"),
+  ADMIN_EMAIL: requiredEnv("ADMIN_EMAIL"),
+  ADMIN_PASSWORD: requiredEnv("ADMIN_PASSWORD")
 };
 
 export const Config = Object.freeze(config);
