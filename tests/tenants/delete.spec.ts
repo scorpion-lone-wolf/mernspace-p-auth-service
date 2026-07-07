@@ -15,7 +15,7 @@ import { AppDataSource } from "../../src/config/dataSource";
 import { Tenant } from "../../src/entities/tenant";
 import { UserRole } from "../../src/enums";
 
-describe("DELETE /admin/tenants", () => {
+describe("DELETE /tenants", () => {
   let dataSource: DataSource;
   let jwksServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -53,7 +53,7 @@ describe("DELETE /admin/tenants", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .delete(`/admin/tenants/${tenant.id}`)
+        .delete(`/tenants/${tenant.id}`)
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.statusCode).toBe(200);
@@ -67,7 +67,7 @@ describe("DELETE /admin/tenants", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .delete(`/admin/tenants/a17527a0-8c62-4c1b-9819-11b32cae28d8`)
+        .delete(`/tenants/a17527a0-8c62-4c1b-9819-11b32cae28d8`)
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.statusCode).toBe(404);

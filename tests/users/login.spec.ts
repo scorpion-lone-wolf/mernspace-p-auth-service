@@ -3,15 +3,20 @@ import { DataSource } from "typeorm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import app from "../../src/app";
 import { AppDataSource } from "../../src/config/dataSource";
+import { Tenant } from "../../src/entities/tenant";
 import { User } from "../../src/entities/user";
 import { UserService } from "../../src/services/userService";
 
 describe("POST /auth/login", () => {
   let dataSource: DataSource;
   let userService: UserService;
+
   beforeAll(async () => {
     dataSource = await AppDataSource.initialize();
-    userService = new UserService(dataSource.getRepository(User));
+    userService = new UserService(
+      dataSource.getRepository(User),
+      dataSource.getRepository(Tenant)
+    );
   });
 
   beforeEach(async () => {

@@ -15,7 +15,7 @@ import { AppDataSource } from "../../src/config/dataSource";
 import { Tenant } from "../../src/entities/tenant";
 import { UserRole } from "../../src/enums";
 
-describe("PATCH /admin/tenants", () => {
+describe("PATCH /tenants", () => {
   let dataSource: DataSource;
   let jwksServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -53,7 +53,7 @@ describe("PATCH /admin/tenants", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .patch(`/admin/tenants/${tenant.id}`)
+        .patch(`/tenants/${tenant.id}`)
         .set("Cookie", [`access_token=${accessToken}`])
         .send({
           name: "Tenant-2",
@@ -75,7 +75,7 @@ describe("PATCH /admin/tenants", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .patch(`/admin/tenants/${tenant.id}`)
+        .patch(`/tenants/${tenant.id}`)
         .set("Cookie", [`access_token=${accessToken}`])
         .send({});
       // Assert
@@ -94,7 +94,7 @@ describe("PATCH /admin/tenants", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .patch(`/admin/tenants/${tenant.id}`)
+        .patch(`/tenants/${tenant.id}`)
         .set("Cookie", [`access_token=${accessToken}`])
         .send({
           name: "Tenant-2"

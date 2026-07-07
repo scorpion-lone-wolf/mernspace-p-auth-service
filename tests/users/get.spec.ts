@@ -15,7 +15,7 @@ import { AppDataSource } from "../../src/config/dataSource";
 import { User } from "../../src/entities/user";
 import { UserRole } from "../../src/enums";
 
-describe("GET /admin/users", () => {
+describe("GET /users", () => {
   let dataSource: DataSource;
   let jwksMockServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -63,7 +63,7 @@ describe("GET /admin/users", () => {
       });
       //   Act
       const response = await request(app)
-        .get("/admin/users")
+        .get("/users")
         .set("Cookie", [`access_token=${adminToken}`]);
       //  Assert
       expect(response.statusCode).toBe(200);
@@ -93,7 +93,7 @@ describe("GET /admin/users", () => {
       });
       //   Act
       const response = await request(app)
-        .get("/admin/users")
+        .get("/users")
         .set("Cookie", [`access_token=${adminToken}`]);
       //  Assert
       expect(response.body.data.length).toBe(2);
@@ -123,14 +123,14 @@ describe("GET /admin/users", () => {
       });
       //   Act
       const response = await request(app)
-        .get("/admin/users")
+        .get("/users")
         .set("Cookie", [`access_token=${adminToken}`]);
       //  Assert
       expect(response.statusCode).toBe(403);
     });
   });
 });
-describe("GET /admin/users/id", () => {
+describe("GET /users/id", () => {
   let dataSource: DataSource;
   let jwksMockServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -186,7 +186,7 @@ describe("GET /admin/users/id", () => {
       });
       //   Act
       const response = await request(app)
-        .get(`/admin/users/${createManagerUser.id}`)
+        .get(`/users/${createManagerUser.id}`)
         .set("Cookie", [`access_token=${adminToken}`]);
       //  Assert
       expect(response.statusCode).toBe(200);
@@ -219,7 +219,7 @@ describe("GET /admin/users/id", () => {
       });
       //   Act
       const response = await request(app)
-        .get(`/admin/users/${createManagerUser.id}`)
+        .get(`/users/${createManagerUser.id}`)
         .set("Cookie", [`access_token=${adminToken}`]);
       //  Assert
       expect(response.body.data.id).toBe(user?.id);
@@ -252,7 +252,7 @@ describe("GET /admin/users/id", () => {
       });
       //   Act
       const response = await request(app)
-        .get(`/admin/users/${createManagerUser.id}`)
+        .get(`/users/${createManagerUser.id}`)
         .set("Cookie", [`access_token=${adminToken}`]);
       //  Assert
       expect(response.statusCode).toBe(403);

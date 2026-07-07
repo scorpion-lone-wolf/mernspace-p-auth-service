@@ -16,7 +16,7 @@ import { Tenant } from "../../src/entities/tenant";
 import { User } from "../../src/entities/user";
 import { UserRole } from "../../src/enums";
 
-describe("PATCH /admin/users/:id", () => {
+describe("PATCH /users/:id", () => {
   let dataSource: DataSource;
   let jwksMockServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -63,7 +63,7 @@ describe("PATCH /admin/users/:id", () => {
     const adminToken = tokenFor(admin);
 
     const response = await request(app)
-      .patch(`/admin/users/${manager.id}`)
+      .patch(`/users/${manager.id}`)
       .set("Cookie", [`access_token=${adminToken}`])
       .send({
         firstName: "New Manager"
@@ -83,7 +83,7 @@ describe("PATCH /admin/users/:id", () => {
     const manager = await createUser(UserRole.MANAGER, "manager@example.com");
 
     const response = await request(app)
-      .patch(`/admin/users/${manager.id}`)
+      .patch(`/users/${manager.id}`)
       .send({ firstName: "New Manager" });
 
     expect(response.statusCode).toBe(401);
@@ -95,7 +95,7 @@ describe("PATCH /admin/users/:id", () => {
     const token = tokenFor(nonAdmin);
 
     const response = await request(app)
-      .patch(`/admin/users/${manager.id}`)
+      .patch(`/users/${manager.id}`)
       .set("Cookie", [`access_token=${token}`])
       .send({ firstName: "New Manager" });
 
@@ -107,7 +107,7 @@ describe("PATCH /admin/users/:id", () => {
     const adminToken = tokenFor(admin);
 
     const response = await request(app)
-      .patch("/admin/users/not-a-uuid")
+      .patch("/users/not-a-uuid")
       .set("Cookie", [`access_token=${adminToken}`])
       .send({ firstName: "New Manager" });
 
@@ -120,7 +120,7 @@ describe("PATCH /admin/users/:id", () => {
     const adminToken = tokenFor(admin);
 
     const response = await request(app)
-      .patch(`/admin/users/${manager.id}`)
+      .patch(`/users/${manager.id}`)
       .set("Cookie", [`access_token=${adminToken}`])
       .send({});
 
@@ -132,7 +132,7 @@ describe("PATCH /admin/users/:id", () => {
     const adminToken = tokenFor(admin);
 
     const response = await request(app)
-      .patch("/admin/users/a17527a0-8c62-4c1b-9819-11b32cae28d8")
+      .patch("/users/a17527a0-8c62-4c1b-9819-11b32cae28d8")
       .set("Cookie", [`access_token=${adminToken}`])
       .send({ firstName: "New Manager" });
 
@@ -146,7 +146,7 @@ describe("PATCH /admin/users/:id", () => {
     const adminToken = tokenFor(admin);
 
     const response = await request(app)
-      .patch(`/admin/users/${manager.id}`)
+      .patch(`/users/${manager.id}`)
       .set("Cookie", [`access_token=${adminToken}`])
       .send({ email: "taken@example.com" });
 
@@ -159,7 +159,7 @@ describe("PATCH /admin/users/:id", () => {
     const adminToken = tokenFor(admin);
 
     const response = await request(app)
-      .patch(`/admin/users/${manager.id}`)
+      .patch(`/users/${manager.id}`)
       .set("Cookie", [`access_token=${adminToken}`])
       .send({ tenantId: "a17527a0-8c62-4c1b-9819-11b32cae28d8" });
 
@@ -176,7 +176,7 @@ describe("PATCH /admin/users/:id", () => {
     const adminToken = tokenFor(admin);
 
     const response = await request(app)
-      .patch(`/admin/users/${manager.id}`)
+      .patch(`/users/${manager.id}`)
       .set("Cookie", [`access_token=${adminToken}`])
       .send({ tenantId: tenant.id });
 

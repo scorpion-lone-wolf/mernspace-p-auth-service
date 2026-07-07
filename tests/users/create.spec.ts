@@ -16,7 +16,7 @@ import { Tenant } from "../../src/entities/tenant";
 import { User } from "../../src/entities/user";
 import { UserRole } from "../../src/enums";
 
-describe("POST /admin/users", () => {
+describe("POST /users", () => {
   let dataSource: DataSource;
   let jwksMockServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -80,7 +80,7 @@ describe("POST /admin/users", () => {
         });
         // Add token to cookie
         const response = await request(app)
-          .post("/admin/users")
+          .post("/users")
           .set("Cookie", [`access_token=${tokenFromJwksServer}`])
           .send(managerUserData);
         // Assert
@@ -121,7 +121,7 @@ describe("POST /admin/users", () => {
         });
         // Add token to cookie
         const response = await request(app)
-          .post("/admin/users")
+          .post("/users")
           .set("Cookie", [`access_token=${tokenFromJwksServer}`])
           .send(managerUserData);
         const createdManagerUser = await userRepository.findOne({
@@ -162,7 +162,7 @@ describe("POST /admin/users", () => {
       });
       // Add token to cookie
       const response = await request(app)
-        .post("/admin/users")
+        .post("/users")
         .set("Cookie", [`access_token=${tokenFromJwksServer}`])
         .send(managerUserData);
       // Assert

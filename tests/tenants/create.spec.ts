@@ -14,7 +14,7 @@ import app from "../../src/app";
 import { AppDataSource } from "../../src/config/dataSource";
 import { Tenant } from "../../src/entities/tenant";
 import { UserRole } from "../../src/enums";
-describe("POST /admin/tenants", () => {
+describe("POST /tenants", () => {
   let dataSource: DataSource;
   let jwksServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -52,7 +52,7 @@ describe("POST /admin/tenants", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .post("/admin/tenants")
+        .post("/tenants")
         .send(tenantData)
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
@@ -70,7 +70,7 @@ describe("POST /admin/tenants", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .post("/admin/tenants")
+        .post("/tenants")
         .send(tenantData)
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
@@ -85,9 +85,7 @@ describe("POST /admin/tenants", () => {
         address: "Address-1"
       };
       //   Act
-      const response = await request(app)
-        .post("/admin/tenants")
-        .send(tenantData);
+      const response = await request(app).post("/tenants").send(tenantData);
       // Assert
       const tenantRepository = dataSource.getRepository(Tenant);
       const tenants = await tenantRepository.find();
@@ -106,7 +104,7 @@ describe("POST /admin/tenants", () => {
         role: UserRole.MANAGER
       });
       const response = await request(app)
-        .post("/admin/tenants")
+        .post("/tenants")
         .send(tenantData)
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
@@ -129,7 +127,7 @@ describe("POST /admin/tenants", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .post("/admin/tenants")
+        .post("/tenants")
         .send(tenantData)
         .set("Cookie", [`access_token=${accessToken}`]);
 

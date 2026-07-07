@@ -15,7 +15,7 @@ import { AppDataSource } from "../../src/config/dataSource";
 import { Tenant } from "../../src/entities/tenant";
 import { UserRole } from "../../src/enums";
 
-describe("GET /admin/tenants", () => {
+describe("GET /tenants", () => {
   let dataSource: DataSource;
   let jwksServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -48,7 +48,7 @@ describe("GET /admin/tenants", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .get("/admin/tenants")
+        .get("/tenants")
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.statusCode).toBe(200);
@@ -67,37 +67,37 @@ describe("GET /admin/tenants", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .get("/admin/tenants")
+        .get("/tenants")
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.body.data.length).toBe(1);
     });
   });
-  describe("Given user is not logged nor authorized", () => {
-    it("should return 401 status code", async () => {
+  describe("Given user is not logged nor authorized as the endpoint is public", () => {
+    it("should return 200 status code", async () => {
       // Prepare
       //   Act
-      const response = await request(app).get("/admin/tenants");
+      const response = await request(app).get("/tenants");
       // Assert
-      expect(response.statusCode).toBe(401);
+      expect(response.statusCode).toBe(200);
     });
   });
   describe("Given user is  logged but not authorized", () => {
-    it("should return 403 status code", async () => {
+    it("should return 200 status code", async () => {
       const accessToken = jwksServer.token({
         sub: "a17527a0-8c62-4c1b-9819-11b32cae28d8",
         role: UserRole.CUSTOMER
       });
       const response = await request(app)
-        .get("/admin/tenants")
+        .get("/tenants")
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
-      expect(response.statusCode).toBe(403);
+      expect(response.statusCode).toBe(200);
     });
   });
 });
 
-describe("GET /admin/tenants/:id", () => {
+describe("GET /tenants/:id", () => {
   let dataSource: DataSource;
   let jwksServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -134,7 +134,7 @@ describe("GET /admin/tenants/:id", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .get(`/admin/tenants/${tenant.id}`)
+        .get(`/tenants/${tenant.id}`)
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.statusCode).toBe(200);
@@ -152,7 +152,7 @@ describe("GET /admin/tenants/:id", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .get(`/admin/tenants/${tenant.id}`)
+        .get(`/tenants/${tenant.id}`)
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.body.data.name).toBe(tenantData.name);
@@ -169,7 +169,7 @@ describe("GET /admin/tenants/:id", () => {
         role: UserRole.ADMIN
       });
       const response = await request(app)
-        .get(`/admin/tenants/a17527a0-8c62-4c1b-9819-11b32cae28d8`)
+        .get(`/tenants/a17527a0-8c62-4c1b-9819-11b32cae28d8`)
         .set("Cookie", [`access_token=${accessToken}`]);
       // Assert
       expect(response.statusCode).toBe(404);

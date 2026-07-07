@@ -15,7 +15,7 @@ import { AppDataSource } from "../../src/config/dataSource";
 import { User } from "../../src/entities/user";
 import { UserRole } from "../../src/enums";
 
-describe("DELETE /admin/users/:id", () => {
+describe("DELETE /users/:id", () => {
   let dataSource: DataSource;
   let jwksMockServer: ReturnType<typeof createJWKSMock>;
   let jwksCleanup: () => void;
@@ -62,7 +62,7 @@ describe("DELETE /admin/users/:id", () => {
     const adminToken = tokenFor(admin);
 
     const response = await request(app)
-      .delete(`/admin/users/${manager.id}`)
+      .delete(`/users/${manager.id}`)
       .set("Cookie", [`access_token=${adminToken}`]);
 
     const user = await dataSource.getRepository(User).findOne({
@@ -78,7 +78,7 @@ describe("DELETE /admin/users/:id", () => {
   it("should return 401 if user is not authenticated", async () => {
     const manager = await createUser(UserRole.MANAGER, "manager@example.com");
 
-    const response = await request(app).delete(`/admin/users/${manager.id}`);
+    const response = await request(app).delete(`/users/${manager.id}`);
 
     expect(response.statusCode).toBe(401);
   });
@@ -89,7 +89,7 @@ describe("DELETE /admin/users/:id", () => {
     const token = tokenFor(nonAdmin);
 
     const response = await request(app)
-      .delete(`/admin/users/${manager.id}`)
+      .delete(`/users/${manager.id}`)
       .set("Cookie", [`access_token=${token}`]);
 
     expect(response.statusCode).toBe(403);
@@ -100,7 +100,7 @@ describe("DELETE /admin/users/:id", () => {
     const adminToken = tokenFor(admin);
 
     const response = await request(app)
-      .delete("/admin/users/not-a-uuid")
+      .delete("/users/not-a-uuid")
       .set("Cookie", [`access_token=${adminToken}`]);
 
     expect(response.statusCode).toBe(400);
@@ -111,7 +111,7 @@ describe("DELETE /admin/users/:id", () => {
     const adminToken = tokenFor(admin);
 
     const response = await request(app)
-      .delete("/admin/users/a17527a0-8c62-4c1b-9819-11b32cae28d8")
+      .delete("/users/a17527a0-8c62-4c1b-9819-11b32cae28d8")
       .set("Cookie", [`access_token=${adminToken}`]);
 
     expect(response.statusCode).toBe(404);
@@ -123,7 +123,7 @@ describe("DELETE /admin/users/:id", () => {
     const adminToken = tokenFor(adminUser);
     // Act
     const response = await request(app)
-      .delete(`/admin/users/${adminUser.id}`)
+      .delete(`/users/${adminUser.id}`)
       .set("Cookie", [`access_token=${adminToken}`]);
 
     // Assert
