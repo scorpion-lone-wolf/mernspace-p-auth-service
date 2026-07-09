@@ -35,7 +35,8 @@ const config = {
   JWKS_URI: requiredEnv("JWKS_URI"),
   PRIVATE_KEY: requiredEnv("PRIVATE_KEY"),
   ADMIN_EMAIL: requiredEnv("ADMIN_EMAIL"),
-  ADMIN_PASSWORD: requiredEnv("ADMIN_PASSWORD")
+  ADMIN_PASSWORD: requiredEnv("ADMIN_PASSWORD"),
+  FRONTEND_URL: requiredEnv("FRONTEND_URL")
 };
 
 export const Config = Object.freeze(config);

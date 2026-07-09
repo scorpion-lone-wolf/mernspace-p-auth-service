@@ -1,7 +1,9 @@
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import expres, { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
 import "reflect-metadata";
+import { Config } from "./config";
 import logger from "./config/logger";
 import authRouter from "./routes/auth";
 import tenantRouter from "./routes/tenant";
@@ -16,6 +18,13 @@ app.use(expres.json());
 app.use(cookieParser());
 // adding static files
 app.use(expres.static("public", { dotfiles: "allow" }));
+// enable cors for all routes and origins
+app.use(
+  cors({
+    origin: [Config.FRONTEND_URL && "http://localhost:5173"],
+    credentials: true
+  })
+);
 
 // route handlers
 app.get("/", async (req, res, next) => {
