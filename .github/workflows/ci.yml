@@ -41,6 +41,7 @@ jobs:
           PRIVATE_KEY: ${{ secrets.TEST_PRIVATE_KEY }}
           ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
+          FRONTEND_URL: ${{ secrets.TEST_FRONTEND_URL }}
 
       - name: Build application
         run: npm run build
