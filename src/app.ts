@@ -21,7 +21,7 @@ app.use(expres.static("public", { dotfiles: "allow" }));
 // enable cors for all routes and origins
 app.use(
   cors({
-    origin: [Config.FRONTEND_URL && "http://localhost:5173"],
+    origin: [Config.FRONTEND_URL || "http://localhost:5173"],
     credentials: true
   })
 );
