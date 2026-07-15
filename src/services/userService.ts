@@ -126,7 +126,10 @@ export class UserService {
   async fetchAll(page: number, limit: number): Promise<User[]> {
     const users = await this.userRepository.find({
       skip: (page - 1) * limit, //offset
-      take: limit
+      take: limit,
+      relations: {
+        tenant: true
+      }
     });
     return users;
   }
