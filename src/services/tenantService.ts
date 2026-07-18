@@ -10,12 +10,12 @@ export class TenantService {
     return await this.tenantRepository.save(tenant);
   }
 
-  async fetchAll(page: number, limit: number): Promise<Tenant[]> {
-    const tenants = await this.tenantRepository.find({
+  async fetchAll(page: number, limit: number): Promise<[Tenant[], number]> {
+    const [tenants, count] = await this.tenantRepository.findAndCount({
       skip: (page - 1) * limit, //offset
       take: limit
     });
-    return tenants;
+    return [tenants, count];
   }
   async fetch(id: string): Promise<Tenant> {
     const tenant = await this.tenantRepository.findOne({ where: { id } });

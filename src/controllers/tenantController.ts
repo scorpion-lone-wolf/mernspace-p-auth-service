@@ -21,14 +21,17 @@ export class TenantController {
     const { page = 1, limit = 10 } = req.query;
     const pageNumber = Math.max(1, Number(page) || 1);
     const limitNumber = Math.max(1, Number(limit) || 10);
-    const tenants = await this.tenantService.fetchAll(
+    const [tenants, count] = await this.tenantService.fetchAll(
       +pageNumber,
       +limitNumber
     );
 
     return res.json({
       message: "Tenant fetched successfully",
-      data: tenants
+      data: tenants,
+      page: pageNumber,
+      limit: limitNumber,
+      total: count
     });
   }
   async get(req: Request, res: Response) {
