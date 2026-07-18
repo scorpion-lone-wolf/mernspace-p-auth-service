@@ -39,10 +39,16 @@ export class UserController {
     const { page = 1, limit = 10 } = req.query;
     const pageNumber = Math.max(1, Number(page) || 1);
     const limitNumber = Math.max(1, Number(limit) || 10);
-    const users = await this.userService.fetchAll(+pageNumber, +limitNumber);
+    const [users, count] = await this.userService.fetchAll(
+      +pageNumber,
+      +limitNumber
+    );
     return res.json({
       message: "Users fetched successfully",
-      data: users
+      data: users,
+      page: pageNumber,
+      limit: limitNumber,
+      total: count
     });
   }
   async get(req: Request, res: Response) {

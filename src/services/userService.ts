@@ -123,15 +123,15 @@ export class UserService {
     });
   }
 
-  async fetchAll(page: number, limit: number): Promise<User[]> {
-    const users = await this.userRepository.find({
+  async fetchAll(page: number, limit: number): Promise<[User[], number]> {
+    const [users, count] = await this.userRepository.findAndCount({
       skip: (page - 1) * limit, //offset
       take: limit,
       relations: {
         tenant: true
       }
     });
-    return users;
+    return [users, count];
   }
 
   async fetch(id: string): Promise<User> {
