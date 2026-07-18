@@ -26,8 +26,7 @@ export class TokenService {
       },
       privateKey,
       {
-        // expiresIn: `${Config.ACCESS_TOKEN_VALIDITY_IN_HOURS}h`,
-        expiresIn: `1m`,
+        expiresIn: `${Config.ACCESS_TOKEN_VALIDITY_IN_HOURS}h`,
         algorithm: "RS256",
         issuer: "auth-service",
         keyid: "auth-key-1"
