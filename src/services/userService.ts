@@ -154,7 +154,9 @@ export class UserService {
     // if (status) {
     //   userQueryBuilder.andWhere("user.status = :status", { status });
     // }
-    const [user, count] = await userQueryBuilder.getManyAndCount();
+    const [user, count] = await userQueryBuilder
+      .orderBy("user.createdAt", "DESC")
+      .getManyAndCount();
     return [user, count];
   }
 

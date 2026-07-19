@@ -32,7 +32,9 @@ export class TenantService {
       );
     }
 
-    const [tenants, count] = await tenantQueryBuilder.getManyAndCount();
+    const [tenants, count] = await tenantQueryBuilder
+      .orderBy("tenant.createdAt", "DESC")
+      .getManyAndCount();
     return [tenants, count];
   }
   async fetch(id: string): Promise<Tenant> {

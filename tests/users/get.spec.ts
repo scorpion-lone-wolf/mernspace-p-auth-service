@@ -98,6 +98,71 @@ describe("GET /users", () => {
       //  Assert
       expect(response.body.data.length).toBe(2);
     });
+    it("should filter users by search query and role", async () => {
+      // Prepare
+      const adminUserData = {
+        firstName: "John",
+        lastName: "admin",
+        email: "admin@example.com",
+        password: "admin123",
+        role: UserRole.ADMIN
+      };
+      const customerUserData = {
+        firstName: "John",
+        lastName: "customer",
+        email: "customer@example.com",
+        password: "customer123",
+        role: UserRole.CUSTOMER
+      };
+      const managerUserData = {
+        firstName: "Manager",
+        lastName: "manager",
+        email: "john.manager@example.com",
+        password: "manager123",
+        role: UserRole.MANAGER
+      };
+      const userRepository = dataSource.getRepository(User);
+      const createdAdminUser = await userRepository.save(adminUserData);
+      await userRepository.save([customerUserData, managerUserData]);
+      const adminToken = jwksMockServer.token({
+        sub: createdAdminUser.id,
+        role: createdAdminUser.role
+      });
+      //   Act
+      const response = await request(app)
+        .get("/users")
+        .query({ search: "John", role: UserRole.ADMIN })
+        .set("Cookie", [`access_token=${adminToken}`]);
+      //  Assert
+      expect(response.statusCode).toBe(200);
+      expect(response.body.data.length).toBe(1);
+      expect(response.body.data[0].id).toBe(createdAdminUser.id);
+      expect(response.body.data[0].role).toBe(UserRole.ADMIN);
+      expect(response.body.total).toBe(1);
+    });
+    it("should return 400 status code for invalid role query", async () => {
+      // Prepare
+      const adminUserData = {
+        firstName: "Admin",
+        lastName: "admin",
+        email: "admin@example.com",
+        password: "admin123",
+        role: UserRole.ADMIN
+      };
+      const userRepository = dataSource.getRepository(User);
+      const createdAdminUser = await userRepository.save(adminUserData);
+      const adminToken = jwksMockServer.token({
+        sub: createdAdminUser.id,
+        role: createdAdminUser.role
+      });
+      //   Act
+      const response = await request(app)
+        .get("/users")
+        .query({ role: "OWNER" })
+        .set("Cookie", [`access_token=${adminToken}`]);
+      //  Assert
+      expect(response.statusCode).toBe(400);
+    });
     it("should return 403 if huser is not authorized", async () => {
       // Prepare
       const userData = {
