@@ -2,6 +2,13 @@ import { Request, Response } from "express";
 import createHttpError from "http-errors";
 import { Logger } from "winston";
 import { TenantService } from "../services/tenantService";
+
+type TenantQuery = {
+  page?: number | string;
+  limit?: number | string;
+  search?: string;
+};
+
 export class TenantController {
   constructor(
     private readonly tenantService: TenantService,
@@ -18,12 +25,17 @@ export class TenantController {
   }
 
   async getAll(req: Request, res: Response) {
-    const { page = 1, limit = 10 } = req.query;
+    const {
+      page = 1,
+      limit = 6,
+      search
+    } = (req.validatedQuery as TenantQuery | undefined) ?? req.query;
     const pageNumber = Math.max(1, Number(page) || 1);
-    const limitNumber = Math.max(1, Number(limit) || 10);
+    const limitNumber = Math.max(1, Number(limit) || 6);
     const [tenants, count] = await this.tenantService.fetchAll(
       +pageNumber,
-      +limitNumber
+      +limitNumber,
+      search as string
     );
 
     return res.json({

@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import { QueryFailedError, Repository } from "typeorm";
+import { Brackets, QueryFailedError, Repository } from "typeorm";
 import { Tenant } from "../entities/tenant";
 
 export class TenantService {
@@ -10,11 +10,29 @@ export class TenantService {
     return await this.tenantRepository.save(tenant);
   }
 
-  async fetchAll(page: number, limit: number): Promise<[Tenant[], number]> {
-    const [tenants, count] = await this.tenantRepository.findAndCount({
-      skip: (page - 1) * limit, //offset
-      take: limit
-    });
+  async fetchAll(
+    page: number,
+    limit: number,
+    search?: string
+  ): Promise<[Tenant[], number]> {
+    const tenantQueryBuilder = this.tenantRepository
+      .createQueryBuilder("tenant")
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    if (search) {
+      tenantQueryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where("tenant.name ILIKE :query", {
+            query: `%${search}%`
+          }).orWhere("tenant.address ILIKE :query", {
+            query: `%${search}%`
+          });
+        })
+      );
+    }
+
+    const [tenants, count] = await tenantQueryBuilder.getManyAndCount();
     return [tenants, count];
   }
   async fetch(id: string): Promise<Tenant> {

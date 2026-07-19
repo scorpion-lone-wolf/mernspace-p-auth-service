@@ -1,7 +1,16 @@
 import { Request, Response } from "express";
 import createHttpError from "http-errors";
+import { UserRole } from "../enums";
 import { UserService } from "../services/userService";
 import { CreateUserData, CreateUserRequest, UpdateUserRequest } from "../types";
+
+type UserQuery = {
+  page?: number | string;
+  limit?: number | string;
+  search?: string;
+  role?: UserRole;
+  status?: string;
+};
 
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -36,12 +45,23 @@ export class UserController {
   }
 
   async getAll(req: Request, res: Response) {
-    const { page = 1, limit = 10 } = req.query;
+    const {
+      page = 1,
+      limit = 6,
+      search,
+      role,
+      status
+    } = (req.validatedQuery as UserQuery | undefined) ?? req.query;
+
     const pageNumber = Math.max(1, Number(page) || 1);
-    const limitNumber = Math.max(1, Number(limit) || 10);
+    const limitNumber = Math.max(1, Number(limit) || 6);
+
     const [users, count] = await this.userService.fetchAll(
       +pageNumber,
-      +limitNumber
+      +limitNumber,
+      search as string,
+      role as UserRole,
+      status as string
     );
     return res.json({
       message: "Users fetched successfully",

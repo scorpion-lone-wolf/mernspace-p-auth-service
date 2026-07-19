@@ -6,10 +6,15 @@ import { User } from "../entities/user";
 import { UserRole } from "../enums";
 import { authenticate } from "../middlewares/authenticate";
 import authorized from "../middlewares/authorized";
-import { valdiate, validateParams } from "../middlewares/validate";
+import {
+  valdiate,
+  validateParams,
+  validateQuery
+} from "../middlewares/validate";
 import { createUserSchema } from "../schemas/createUserSchema";
 import { idParamSchema } from "../schemas/paramsSchema";
 import { updateUserSchema } from "../schemas/updateUserSchema";
+import { userQuerySchema } from "../schemas/userQuery";
 import { UserService } from "../services/userService";
 
 const userRouter = express.Router();
@@ -26,8 +31,12 @@ userRouter.post(
   valdiate(createUserSchema),
   (req, res) => userController.create(req, res)
 );
-userRouter.get("/", authenticate, authorized([UserRole.ADMIN]), (req, res) =>
-  userController.getAll(req, res)
+userRouter.get(
+  "/",
+  authenticate,
+  authorized([UserRole.ADMIN]),
+  validateQuery(userQuerySchema),
+  (req, res) => userController.getAll(req, res)
 );
 userRouter.get(
   "/:id",

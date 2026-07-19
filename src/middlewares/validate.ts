@@ -29,3 +29,17 @@ export const validateParams =
       throw createHttpError(400, "Validation failed. Invalid request. ");
     }
   };
+
+export const validateQuery =
+  (schama: ZodType) =>
+  (req: Request, _res: Response, next: NextFunction): void => {
+    try {
+      req.validatedQuery = schama.parse(req.query)!;
+      next();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw createHttpError(400, error.issues[0]?.message as string);
+      }
+      throw createHttpError(400, "Validation failed. Invalid request. ");
+    }
+  };

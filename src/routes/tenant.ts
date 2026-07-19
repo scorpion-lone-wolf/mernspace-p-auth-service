@@ -6,8 +6,13 @@ import { Tenant } from "../entities/tenant";
 import { UserRole } from "../enums";
 import { authenticate } from "../middlewares/authenticate";
 import authorized from "../middlewares/authorized";
-import { valdiate, validateParams } from "../middlewares/validate";
+import {
+  valdiate,
+  validateParams,
+  validateQuery
+} from "../middlewares/validate";
 import { idParamSchema } from "../schemas/paramsSchema";
+import { tenantQuerySchema } from "../schemas/tenantQuery";
 import { tenantSchema } from "../schemas/tenantSchema";
 import updateTenantSchema from "../schemas/updateTenantSchema";
 import { TenantService } from "../services/tenantService";
@@ -29,7 +34,9 @@ tenantRouter.post(
   (req, res) => tenantController.create(req, res)
 );
 
-tenantRouter.get("/", (req, res) => tenantController.getAll(req, res));
+tenantRouter.get("/", validateQuery(tenantQuerySchema), (req, res) =>
+  tenantController.getAll(req, res)
+);
 tenantRouter.get(
   "/:id",
   authenticate,

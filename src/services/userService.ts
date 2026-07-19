@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import createHttpError, { HttpError } from "http-errors";
-import { DeepPartial, Repository } from "typeorm";
+import { Brackets, DeepPartial, Repository } from "typeorm";
 import { User } from "../entities/user";
 import { UserRole } from "../enums";
 import { RegisterUserData, UpdateUserData } from "../types";
@@ -123,15 +123,39 @@ export class UserService {
     });
   }
 
-  async fetchAll(page: number, limit: number): Promise<[User[], number]> {
-    const [users, count] = await this.userRepository.findAndCount({
-      skip: (page - 1) * limit, //offset
-      take: limit,
-      relations: {
-        tenant: true
-      }
-    });
-    return [users, count];
+  async fetchAll(
+    page: number,
+    limit: number,
+    search?: string,
+    role?: string,
+    status?: string
+  ): Promise<[User[], number]> {
+    // creataing a querybuilder
+    let userQueryBuilder = this.userRepository
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.tenant", "tenant")
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    if (search) {
+      userQueryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where("user.firstName ILIKE :query", {
+            query: `%${search}%`
+          }).orWhere("user.email ILIKE :query", {
+            query: `%${search}%`
+          });
+        })
+      );
+    }
+    if (role) {
+      userQueryBuilder.andWhere("user.role = :role", { role });
+    }
+    // if (status) {
+    //   userQueryBuilder.andWhere("user.status = :status", { status });
+    // }
+    const [user, count] = await userQueryBuilder.getManyAndCount();
+    return [user, count];
   }
 
   async fetch(id: string): Promise<User> {
