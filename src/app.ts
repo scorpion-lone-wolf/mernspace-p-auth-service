@@ -1,10 +1,9 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import expres, { NextFunction, Request, Response } from "express";
-import { HttpError } from "http-errors";
+import expres from "express";
 import "reflect-metadata";
 import { Config } from "./config";
-import logger from "./config/logger";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 import authRouter from "./routes/auth";
 import tenantRouter from "./routes/tenant";
 import userRouter from "./routes/user";
@@ -37,19 +36,6 @@ app.use("/tenants", tenantRouter);
 app.use("/users", userRouter);
 
 // global error handler (it has 4 param which help express distinguish between normal middleware and global error handler)
-app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
-  logger.error(err.message);
-  const statusCode = err.status || 500;
-  res.status(statusCode).json({
-    errors: [
-      {
-        type: err.name,
-        message: err.message,
-        path: "", // url path where error has occur
-        location: "" // location like line number where error has occur
-      }
-    ]
-  });
-});
+app.use(globalErrorHandler);
 
 export default app;
