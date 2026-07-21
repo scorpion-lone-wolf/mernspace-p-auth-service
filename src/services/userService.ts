@@ -177,13 +177,18 @@ export class UserService {
         throw createHttpError(404, "User not found");
       }
 
+      const nextRole = data.role ?? user.role;
+
       // update user based on what is asked
       user.firstName = data.firstName ?? user.firstName;
       user.lastName = data.lastName ?? user.lastName;
       user.email = data.email ?? user.email;
-      user.role = data.role ?? user.role;
-      // check if tenant exist or not
-      if (data.tenantId) {
+      user.role = nextRole;
+
+      if (nextRole === UserRole.ADMIN) {
+        user.tenant = null;
+      } else if (data.tenantId) {
+        // check if tenant exist or not
         const tenant = await this.tenantRepository.findOne({
           where: { id: data.tenantId }
         });

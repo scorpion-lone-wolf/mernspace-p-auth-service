@@ -32,7 +32,7 @@ export class User extends BaseEntity {
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
   refreshTokens!: RefreshToken[];
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.users)
+  @ManyToOne(() => Tenant, (tenant) => tenant.users, { nullable: true })
   @JoinColumn({ name: "tenantId" }) // this name will be shown in the database column name as foreign key
-  tenant!: Tenant;
+  tenant!: Tenant | null;
 }

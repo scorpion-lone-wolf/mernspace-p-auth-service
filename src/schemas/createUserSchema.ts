@@ -16,5 +16,5 @@ export const createUserSchema = z.object({
     z.string().min(6, "Password must be at least 6 characters long")
   ),
   role: z.enum(["ADMIN", "MANAGER", "CUSTOMER"]),
-  tenantId: z.uuid()
+  tenantId: z.uuid().optional()
 });
