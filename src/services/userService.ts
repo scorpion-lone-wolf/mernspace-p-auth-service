@@ -51,7 +51,11 @@ export class UserService {
         role
       };
 
-      if (tenantId) {
+      if (role === UserRole.ADMIN && tenantId) {
+        throw createHttpError(400, "Tenant ID is not allowed for admin users");
+      }
+
+      if (role !== UserRole.ADMIN && tenantId) {
         // check if tenant exists
         const tenant = await this.tenantRepository.findOne({
           where: { id: tenantId }
@@ -186,6 +190,12 @@ export class UserService {
       user.role = nextRole;
 
       if (nextRole === UserRole.ADMIN) {
+        if (data.tenantId) {
+          throw createHttpError(
+            400,
+            "Tenant ID is not allowed for admin users"
+          );
+        }
         user.tenant = null;
       } else if (data.tenantId) {
         // check if tenant exist or not

@@ -22,7 +22,7 @@ export class UserController {
       });
     }
 
-    let {
+    const {
       firstName,
       lastName,
       email,
@@ -31,16 +31,13 @@ export class UserController {
       tenantId
     }: CreateUserData = req.body;
 
-    if (!tenantId) {
-      tenantId = "";
-    }
     const createdUser = await this.userService.create({
       firstName,
       lastName,
       email,
       password,
       role,
-      tenantId
+      ...(tenantId && { tenantId })
     });
     res.status(201).json({
       message: "User created successfully",
@@ -90,16 +87,13 @@ export class UserController {
     if (Object.keys(req.body).length === 0) {
       throw createHttpError(400, "At least one field is required to update");
     }
-    let { firstName, lastName, email, role, tenantId } = req.body;
-    if (role === UserRole.ADMIN) {
-      tenantId = "";
-    }
+    const { firstName, lastName, email, role, tenantId } = req.body;
     const user = await this.userService.update(id, {
       firstName,
       lastName,
       email,
       role,
-      tenantId
+      ...(tenantId && { tenantId })
     });
     return res.json({
       message: "User updated",

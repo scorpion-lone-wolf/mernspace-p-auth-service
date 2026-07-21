@@ -8,16 +8,26 @@ const plainText = z.string().transform((value) => {
   });
 });
 
-export const updateUserSchema = z.object({
-  firstName: plainText
-    .pipe(z.string().min(1, "First name is required"))
-    .optional(),
-  lastName: plainText
-    .pipe(z.string().min(1, "Last name is required"))
-    .optional(),
-  email: plainText
-    .pipe(z.email("Invalid email address").toLowerCase())
-    .optional(), // convert email to lowercase to store later in the database
-  role: z.enum(["ADMIN", "MANAGER", "CUSTOMER"]).optional(),
-  tenantId: z.uuid().optional()
-});
+export const updateUserSchema = z
+  .object({
+    firstName: plainText
+      .pipe(z.string().min(1, "First name is required"))
+      .optional(),
+    lastName: plainText
+      .pipe(z.string().min(1, "Last name is required"))
+      .optional(),
+    email: plainText
+      .pipe(z.email("Invalid email address").toLowerCase())
+      .optional(), // convert email to lowercase to store later in the database
+    role: z.enum(["ADMIN", "MANAGER", "CUSTOMER"]).optional(),
+    tenantId: z.uuid().optional()
+  })
+  .superRefine((data, ctx) => {
+    if (data.role === "ADMIN" && data.tenantId) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["tenantId"],
+        message: "Tenant ID is not allowed for admin users"
+      });
+    }
+  });

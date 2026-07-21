@@ -20,6 +20,14 @@ export const createUserSchema = z
     tenantId: z.uuid().optional()
   })
   .superRefine((data, ctx) => {
+    if (data.role === "ADMIN" && data.tenantId) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["tenantId"],
+        message: "Tenant ID is not allowed for admin users"
+      });
+    }
+
     if (data.role === "MANAGER" && !data.tenantId) {
       ctx.addIssue({
         code: "custom",
