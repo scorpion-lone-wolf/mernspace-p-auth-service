@@ -1,28 +1,20 @@
-FROM node:trixie-slim AS builder
+# Use the official Node.js image as our base
+FROM node:trixie-slim
 
-WORKDIR /app
+# Set the working directory inside the container
+WORKDIR /usr/src/app
 
+# Copy package.json and package-lock.json first to leverage Docker cache
 COPY package*.json ./
 
-RUN npm ci
+# Install app dependencies
+RUN npm install
 
+# Copy the rest of our app's source code into the container
 COPY . .
 
-RUN npm run build
-# ========================================
-FROM node:trixie-slim AS dev
-
-ENV NODE_ENV=development
-
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm ci --ignore-scripts
-
-
+# Expose the port the app will run on
 EXPOSE 5501
 
-USER node
-
-CMD ["node" , "src/server.js"]
+# The command to run our app
+CMD ["npm", "run", "dev"]
