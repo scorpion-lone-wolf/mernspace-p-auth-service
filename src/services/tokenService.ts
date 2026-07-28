@@ -19,10 +19,12 @@ export class TokenService {
       logger.error("Failed to read key", { error });
       throw createHttpError(500, "Failed to read key");
     }
+    console.log("--------------", user);
     const accessToken = jwt.sign(
       {
         sub: user.id,
-        role: user.role
+        role: user.role,
+        tenant: user.tenant?.id
       },
       privateKey,
       {

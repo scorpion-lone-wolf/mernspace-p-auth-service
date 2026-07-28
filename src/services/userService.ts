@@ -86,7 +86,14 @@ export class UserService {
       // Step 1:  Check if user exists or not
       const user = await this.userRepository.findOne({
         where: { email: email },
-        select: { id: true, password: true, email: true, role: true } // select only id , email and password explicitly
+        relations: { tenant: true },
+        select: {
+          id: true,
+          password: true,
+          email: true,
+          role: true,
+          tenant: true
+        } // select only id , email and password explicitly
       });
       if (!user) {
         throw createHttpError(404, "User not found");
@@ -97,7 +104,12 @@ export class UserService {
         throw createHttpError(401, "Password is incorrect");
       }
 
-      return { id: user.id, email: user.email, role: user.role } as User;
+      return {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        tenant: user.tenant
+      } as User;
     } catch (err) {
       if (
         isUniqueConstraintError(err) ||
